@@ -9,3 +9,4 @@ npm-debug.log
 dist/
 build/
 .env*
+.claude/settings.local.json
