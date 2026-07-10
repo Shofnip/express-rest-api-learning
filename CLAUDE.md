@@ -55,6 +55,48 @@ const isTaskTitleEmpty = (title) => !title || title.trim().length === 0;
 const validarTituloTarefa = () => {}; // File/variable name mixing languages
 ```
 
+### 3. Comments — Only When Really Necessary
+
+**Avoid polluting code with excessive comments.** Write self-documenting code with clear names and logic. Comment only when:
+- The **WHY** is non-obvious (e.g., workaround for a browser bug, optimization reason)
+- Behavior violates common expectations (e.g., intentional mutation instead of immutability)
+- Complex algorithm logic that's not immediately clear from the code
+
+**DO NOT comment:**
+- What the code does (clear naming already communicates this)
+- How it works (if needed, the code design is unclear — refactor instead)
+- Stating the obvious (e.g., `// increment counter`)
+- Removed code or historical notes (`// this used to be X`)
+
+```javascript
+// ✅ Good: Clear naming, no comment needed
+const isTaskCompleted = (task) => task.completed === true;
+
+const validateTaskTitle = (title) => {
+  if (!title.trim().length) {
+    throw new Error('Title is required');
+  }
+};
+
+// ✅ Good: Comment explains non-obvious WHY
+// Trim whitespace here to prevent edge case where user submits title with only spaces
+const sanitizedTitle = title.trim();
+
+// ❌ Bad: Excessive/obvious comments
+const isTaskCompleted = (task) => {
+  // Check if task is completed
+  // Returns true if task.completed is true
+  // Returns false otherwise
+  return task.completed === true;
+};
+
+// ❌ Bad: Comment restates the code
+let i = 0; // set i to 0
+i++; // increment i
+```
+
+**Portuguese in comments:** Yes, if needed. Use Portuguese only in comments and user-facing messages. Variable names, function names, file names remain in English.
+
 ## Project Structure
 
 ```
