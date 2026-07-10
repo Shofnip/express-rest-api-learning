@@ -1,0 +1,34 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(timeout 10 npm start)",
+      "Bash(curl -s http://localhost:3000/)",
+      "Bash(curl -s -X POST http://localhost:3000/api/tarefas -H 'Content-Type: application/json' -d '{\"titulo\":\"Aprender Express\",\"descricao\":\"Estudar o framework Express\"}')",
+      "Bash(curl -s -X POST http://localhost:3000/api/tarefas -H 'Content-Type: application/json' -d '{\"titulo\":\"Fazer requisição HTTP\",\"descricao\":\"Testar endpoints da API\"}')",
+      "Bash(curl -s http://localhost:3000/api/tarefas)",
+      "Bash(curl -s http://localhost:3000/api/tarefas/1)",
+      "Bash(python -m json.tool)",
+      "Bash(curl -s -X PUT http://localhost:3000/api/tarefas/1 -H 'Content-Type: application/json' -d '{\"concluida\":true}')",
+      "Bash(curl -s -X DELETE http://localhost:3000/api/tarefas/2)",
+      "Bash(curl -s http://localhost:3000/api/tarefas/999)",
+      "Bash(curl -s -X POST http://localhost:3000/api/tarefas -H 'Content-Type: application/json' -d '{\"descricao\":\"Tarefa sem titulo\"}')",
+      "PowerShell(Stop-Process *)",
+      "Bash(curl -s -X POST http://localhost:3000/api/tarefas -H 'Content-Type: application/json' -d '{\"titulo\":\"Aprender Express\",\"descricao\":\"Estudar o framework Express.js\"}')",
+      "Bash(curl -s -X POST http://localhost:3000/api/tarefas -H 'Content-Type: application/json' -d '{\"titulo\":\"Implementar CRUD\",\"descricao\":\"Criar endpoints para tarefas\"}')",
+      "Bash(curl -s -X POST http://localhost:3000/api/tarefas -H 'Content-Type: application/json' -d '{\"titulo\":\"Testar API\",\"descricao\":\"Validar todos os endpoints\"}')",
+      "Bash(curl -s http://localhost:3000/api/tarefas/2)",
+      "Bash(curl -s http://localhost:3000/api/tarefas/3)",
+      "Bash(curl -s -X PUT http://localhost:3000/api/tarefas/2 -H 'Content-Type: application/json' -d '{\"titulo\":\"CRUD Completo com Express\",\"descricao\":\"POST, GET, PUT, DELETE implementados\"}')",
+      "Bash(curl -s -X PUT http://localhost:3000/api/tarefas/3 -H 'Content-Type: application/json' -d '{\"descricao\":\"Todos os endpoints testados com sucesso!\"}')",
+      "Bash(curl -s -X DELETE http://localhost:3000/api/tarefas/1)",
+      "Bash(curl -s -X PUT http://localhost:3000/api/tarefas/999 -H 'Content-Type: application/json' -d '{\"concluida\":true}')",
+      "Bash(curl -s -X DELETE http://localhost:3000/api/tarefas/999)",
+      "Bash(curl -s -X POST http://localhost:3000/api/tarefas -H 'Content-Type: application/json' -d '{\"descricao\":\"Sem titulo\"}')",
+      "Bash(git init *)",
+      "Bash(git config *)",
+      "Bash(git add *)",
+      "Bash(git commit -m 'Initial commit: REST API with Express.js and in-memory task storage *)"
+    ]
+  }
+}
