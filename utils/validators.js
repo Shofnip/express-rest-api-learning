@@ -59,7 +59,21 @@ const validateUpdateTask = (body) => {
   return { isValid: true };
 };
 
+const validateDueDate = (dueDate) => {
+  if (!dueDate || dueDate.trim().length === 0) {
+    return { isValid: false, error: 'A data de vencimento é obrigatória' };
+  }
+
+  const date = new Date(dueDate);
+  if (isNaN(date.getTime())) {
+    return { isValid: false, error: 'Data de vencimento inválida. Use formato ISO 8601 (ex: 2026-07-15T10:00:00Z)' };
+  }
+
+  return { isValid: true };
+};
+
 module.exports = {
   validateCreateTask,
-  validateUpdateTask
+  validateUpdateTask,
+  validateDueDate
 };

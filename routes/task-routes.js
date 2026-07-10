@@ -8,6 +8,7 @@ router.get('/', taskController.list);
 router.get('/:id', taskController.getById);
 router.put('/:id', taskController.update);
 router.patch('/:id/complete', taskController.markAsCompleted);
+router.patch('/:id/due-date', taskController.setDueDate);
 router.delete('/:id', taskController.remove);
 
 module.exports = router;

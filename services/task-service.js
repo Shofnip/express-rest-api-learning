@@ -51,6 +51,15 @@ const markAsCompleted = (id) => {
   return task;
 };
 
+const setDueDate = (id, dueDate) => {
+  const task = findById(id);
+
+  if (!task) return null;
+
+  task.dueDate = dueDate;
+  return task;
+};
+
 const deleteById = (id) => {
   const index = findIndexById(id);
 
@@ -66,5 +75,6 @@ module.exports = {
   getById,
   updateById,
   markAsCompleted,
+  setDueDate,
   deleteById
 };

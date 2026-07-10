@@ -90,6 +90,48 @@ PATCH {{baseUrl}}/tasks/3/complete
 ### Tentar marcar tarefa inexistente (erro)
 PATCH {{baseUrl}}/tasks/999/complete
 
+### ========== DEFINIR DATA DE VENCIMENTO ==========
+
+### Definir data de vencimento para tarefa 1
+PATCH {{baseUrl}}/tasks/1/due-date
+Content-Type: application/json
+
+{
+  "dueDate": "2026-07-20T14:30:00Z"
+}
+
+### Definir data de vencimento para tarefa 2
+PATCH {{baseUrl}}/tasks/2/due-date
+Content-Type: application/json
+
+{
+  "dueDate": "2026-08-15T09:00:00Z"
+}
+
+### Definir data de vencimento para tarefa 3
+PATCH {{baseUrl}}/tasks/3/due-date
+Content-Type: application/json
+
+{
+  "dueDate": "2026-12-31T23:59:00Z"
+}
+
+### Tentar definir data inválida (erro)
+PATCH {{baseUrl}}/tasks/1/due-date
+Content-Type: application/json
+
+{
+  "dueDate": "data-invalida"
+}
+
+### Tentar definir data em tarefa inexistente (erro)
+PATCH {{baseUrl}}/tasks/999/due-date
+Content-Type: application/json
+
+{
+  "dueDate": "2026-07-20T14:30:00Z"
+}
+
 ### ========== DELETAR TAREFAS ==========
 
 ### Deletar tarefa 2
