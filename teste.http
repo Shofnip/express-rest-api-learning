@@ -79,6 +79,17 @@ Content-Type: application/json
   "description": "Testar todos os endpoints: POST, GET, PUT, DELETE"
 }
 
+### ========== MARCAR COMO CONCLUÍDO ==========
+
+### Marcar tarefa 1 como concluída (nova rota)
+PATCH {{baseUrl}}/tasks/1/complete
+
+### Marcar tarefa 3 como concluída
+PATCH {{baseUrl}}/tasks/3/complete
+
+### Tentar marcar tarefa inexistente (erro)
+PATCH {{baseUrl}}/tasks/999/complete
+
 ### ========== DELETAR TAREFAS ==========
 
 ### Deletar tarefa 2
