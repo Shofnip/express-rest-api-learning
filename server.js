@@ -1,5 +1,5 @@
 const express = require('express');
-const rotasTarefas = require('./routes/tarefas');
+const taskRoutes = require('./routes/task-routes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use('/api/tarefas', rotasTarefas);
+app.use('/api/tasks', taskRoutes);
 
 app.get('/', (req, res) => {
   res.json({ mensagem: 'Bem-vindo à API de Tarefas!' });
