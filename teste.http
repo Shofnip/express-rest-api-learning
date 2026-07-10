@@ -6,106 +6,106 @@ GET http://localhost:3000/
 ### ========== CRIAR TAREFAS ==========
 
 ### Criar tarefa 1
-POST {{baseUrl}}/tarefas
+POST {{baseUrl}}/tasks
 Content-Type: application/json
 
 {
-  "titulo": "Aprender Express",
-  "descricao": "Estudar o framework Express.js",
-  "concluida": false
+  "title": "Aprender Express",
+  "description": "Estudar o framework Express.js",
+  "completed": false
 }
 
 ### Criar tarefa 2
-POST {{baseUrl}}/tarefas
+POST {{baseUrl}}/tasks
 Content-Type: application/json
 
 {
-  "titulo": "Criar API REST",
-  "descricao": "Implementar CRUD com Express"
+  "title": "Criar API REST",
+  "description": "Implementar CRUD com Express"
 }
 
 ### Criar tarefa 3
-POST {{baseUrl}}/tarefas
+POST {{baseUrl}}/tasks
 Content-Type: application/json
 
 {
-  "titulo": "Testar endpoints",
-  "descricao": "Validar todas as rotas da API"
+  "title": "Testar endpoints",
+  "description": "Validar todas as rotas da API"
 }
 
 ### ========== LISTAR TAREFAS ==========
 
 ### Listar todas as tarefas
-GET {{baseUrl}}/tarefas
+GET {{baseUrl}}/tasks
 
 ### ========== BUSCAR POR ID ==========
 
 ### Buscar tarefa ID 1
-GET {{baseUrl}}/tarefas/1
+GET {{baseUrl}}/tasks/1
 
 ### Buscar tarefa ID 2
-GET {{baseUrl}}/tarefas/2
+GET {{baseUrl}}/tasks/2
 
 ### Buscar tarefa ID 3
-GET {{baseUrl}}/tarefas/3
+GET {{baseUrl}}/tasks/3
 
 ### Buscar tarefa inexistente (erro)
-GET {{baseUrl}}/tarefas/999
+GET {{baseUrl}}/tasks/999
 
 ### ========== ATUALIZAR TAREFAS ==========
 
 ### Marcar tarefa 1 como concluída
-PUT {{baseUrl}}/tarefas/1
+PUT {{baseUrl}}/tasks/1
 Content-Type: application/json
 
 {
-  "concluida": true
+  "completed": true
 }
 
 ### Atualizar título da tarefa 2
-PUT {{baseUrl}}/tarefas/2
+PUT {{baseUrl}}/tasks/2
 Content-Type: application/json
 
 {
-  "titulo": "Criar API REST com Express",
-  "descricao": "Implementar CRUD completo com Node.js"
+  "title": "Criar API REST com Express",
+  "description": "Implementar CRUD completo com Node.js"
 }
 
 ### Atualizar apenas descrição da tarefa 3
-PUT {{baseUrl}}/tarefas/3
+PUT {{baseUrl}}/tasks/3
 Content-Type: application/json
 
 {
-  "descricao": "Testar todos os endpoints: POST, GET, PUT, DELETE"
+  "description": "Testar todos os endpoints: POST, GET, PUT, DELETE"
 }
 
 ### ========== DELETAR TAREFAS ==========
 
 ### Deletar tarefa 2
-DELETE {{baseUrl}}/tarefas/2
+DELETE {{baseUrl}}/tasks/2
 
 ### Deletar tarefa inexistente (erro)
-DELETE {{baseUrl}}/tarefas/999
+DELETE {{baseUrl}}/tasks/999
 
 ### ========== LISTAR FINAL ==========
 
 ### Listar tarefas restantes
-GET {{baseUrl}}/tarefas
+GET {{baseUrl}}/tasks
 
 ### ========== TESTES DE ERRO ==========
 
 ### Criar tarefa sem título (erro)
-POST {{baseUrl}}/tarefas
+POST {{baseUrl}}/tasks
 Content-Type: application/json
 
 {
-  "descricao": "Tarefa sem título"
+  "description": "Tarefa sem título"
 }
 
 ### Criar tarefa com apenas título
-POST {{baseUrl}}/tarefas
+POST {{baseUrl}}/tasks
 Content-Type: application/json
 
 {
-  "titulo": "Tarefa simples"
+  "title": "Tarefa simples"
 }

@@ -5,13 +5,13 @@ Uma API REST simples para gerenciar tarefas, construída com Express.js e utiliz
 ## Estrutura do Projeto
 
 ```
-tarefas-api/
+express-rest-api-learning/
 ├── server.js                      # Arquivo principal - inicia o servidor
 ├── package.json                   # Dependências do projeto
 ├── routes/
-│   └── tarefas.js                # Definição de rotas da API
+│   └── task-routes.js             # Definição de rotas da API
 └── controllers/
-    └── tarefasController.js       # Lógica de negócio para tarefas
+    └── task-controller.js         # Lógica de negócio para tarefas
 ```
 
 ## Instalação
@@ -38,14 +38,14 @@ A API estará disponível em `http://localhost:3000`
 ## Endpoints
 
 ### 1. Criar Tarefa
-**POST** `/api/tarefas`
+**POST** `/api/tasks`
 
 Body (JSON):
 ```json
 {
-  "titulo": "Minha tarefa",
-  "descricao": "Descrição da tarefa",
-  "concluida": false
+  "title": "Minha tarefa",
+  "description": "Descrição da tarefa",
+  "completed": false
 }
 ```
 
@@ -53,51 +53,51 @@ Resposta (201 Created):
 ```json
 {
   "id": 1,
-  "titulo": "Minha tarefa",
-  "descricao": "Descrição da tarefa",
-  "concluida": false,
-  "dataCriacao": "2026-07-10T10:30:00.000Z"
+  "title": "Minha tarefa",
+  "description": "Descrição da tarefa",
+  "completed": false,
+  "createdAt": "2026-07-10T10:30:00.000Z"
 }
 ```
 
 ### 2. Listar Todas as Tarefas
-**GET** `/api/tarefas`
+**GET** `/api/tasks`
 
 Resposta (200 OK):
 ```json
 [
   {
     "id": 1,
-    "titulo": "Minha tarefa",
-    "descricao": "Descrição da tarefa",
-    "concluida": false,
-    "dataCriacao": "2026-07-10T10:30:00.000Z"
+    "title": "Minha tarefa",
+    "description": "Descrição da tarefa",
+    "completed": false,
+    "createdAt": "2026-07-10T10:30:00.000Z"
   }
 ]
 ```
 
 ### 3. Buscar Tarefa por ID
-**GET** `/api/tarefas/:id`
+**GET** `/api/tasks/:id`
 
 Resposta (200 OK):
 ```json
 {
   "id": 1,
-  "titulo": "Minha tarefa",
-  "descricao": "Descrição da tarefa",
-  "concluida": false,
-  "dataCriacao": "2026-07-10T10:30:00.000Z"
+  "title": "Minha tarefa",
+  "description": "Descrição da tarefa",
+  "completed": false,
+  "createdAt": "2026-07-10T10:30:00.000Z"
 }
 ```
 
 ### 4. Atualizar Tarefa
-**PUT** `/api/tarefas/:id`
+**PUT** `/api/tasks/:id`
 
 Body (JSON):
 ```json
 {
-  "titulo": "Tarefa atualizada",
-  "concluida": true
+  "title": "Tarefa atualizada",
+  "completed": true
 }
 ```
 
@@ -105,26 +105,26 @@ Resposta (200 OK):
 ```json
 {
   "id": 1,
-  "titulo": "Tarefa atualizada",
-  "descricao": "Descrição da tarefa",
-  "concluida": true,
-  "dataCriacao": "2026-07-10T10:30:00.000Z"
+  "title": "Tarefa atualizada",
+  "description": "Descrição da tarefa",
+  "completed": true,
+  "createdAt": "2026-07-10T10:30:00.000Z"
 }
 ```
 
 ### 5. Deletar Tarefa
-**DELETE** `/api/tarefas/:id`
+**DELETE** `/api/tasks/:id`
 
 Resposta (200 OK):
 ```json
 {
-  "mensagem": "Tarefa deletada com sucesso",
-  "tarefa": {
+  "message": "Tarefa deletada com sucesso",
+  "task": {
     "id": 1,
-    "titulo": "Minha tarefa",
-    "descricao": "Descrição da tarefa",
-    "concluida": false,
-    "dataCriacao": "2026-07-10T10:30:00.000Z"
+    "title": "Minha tarefa",
+    "description": "Descrição da tarefa",
+    "completed": false,
+    "createdAt": "2026-07-10T10:30:00.000Z"
   }
 }
 ```
@@ -133,28 +133,29 @@ Resposta (200 OK):
 
 ```bash
 # Criar tarefa
-curl -X POST http://localhost:3000/api/tarefas \
+curl -X POST http://localhost:3000/api/tasks \
   -H "Content-Type: application/json" \
-  -d '{"titulo":"Aprender Express","descricao":"Estudar o framework Express"}'
+  -d '{"title":"Aprender Express","description":"Estudar o framework Express"}'
 
 # Listar tarefas
-curl http://localhost:3000/api/tarefas
+curl http://localhost:3000/api/tasks
 
 # Buscar tarefa por ID
-curl http://localhost:3000/api/tarefas/1
+curl http://localhost:3000/api/tasks/1
 
 # Atualizar tarefa
-curl -X PUT http://localhost:3000/api/tarefas/1 \
+curl -X PUT http://localhost:3000/api/tasks/1 \
   -H "Content-Type: application/json" \
-  -d '{"concluida":true}'
+  -d '{"completed":true}'
 
 # Deletar tarefa
-curl -X DELETE http://localhost:3000/api/tarefas/1
+curl -X DELETE http://localhost:3000/api/tasks/1
 ```
 
 ## Notas
 
 - Os dados são armazenados em memória (array) e serão perdidos quando o servidor for reiniciado
 - Cada tarefa recebe um ID único incrementado automaticamente
-- O campo `dataCriacao` é preenchido automaticamente na criação
-- Campos opcionais na criação: `descricao` (padrão: '') e `concluida` (padrão: false)
+- O campo `createdAt` é preenchido automaticamente na criação com timestamp ISO 8601
+- Campos opcionais na criação: `description` (padrão: '') e `completed` (padrão: false)
+- Consulte CLAUDE.md para regras de negócio completas e padrões de desenvolvimento
