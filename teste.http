@@ -85,6 +85,20 @@ GET {{baseUrl}}/tasks/status/pending
 ### Tentar listar com status inválido (erro)
 GET {{baseUrl}}/tasks/status/invalido
 
+### ========== LISTAR POR PRIORIDADE ==========
+
+### Listar tarefas com prioridade alta
+GET {{baseUrl}}/tasks/priority/high
+
+### Listar tarefas com prioridade média
+GET {{baseUrl}}/tasks/priority/medium
+
+### Listar tarefas com prioridade baixa
+GET {{baseUrl}}/tasks/priority/low
+
+### Tentar listar com prioridade inválida (erro)
+GET {{baseUrl}}/tasks/priority/urgente
+
 ### ========== CONTAR TAREFAS ==========
 
 ### Contar todas as tarefas

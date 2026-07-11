@@ -11,8 +11,8 @@ const save = (taskData) => {
     title: taskData.title.trim(),
     description: taskData.description ? taskData.description.trim() : '',
     completed: taskData.completed || false,
-    dueDate: null,
     priority: taskData.priority || null,
+    dueDate: null,
     createdAt: new Date().toISOString()
   };
 
@@ -25,6 +25,8 @@ const getAll = () => tasks;
 const getById = (id) => findById(id);
 
 const getByStatus = (completed) => tasks.filter(t => t.completed === completed);
+
+const getByPriority = (priority) => tasks.filter(t => t.priority === priority);
 
 const count = (completed) => {
   if (completed === undefined) return tasks.length;
@@ -87,6 +89,7 @@ module.exports = {
   getAll,
   getById,
   getByStatus,
+  getByPriority,
   count,
   updateById,
   markAsCompleted,

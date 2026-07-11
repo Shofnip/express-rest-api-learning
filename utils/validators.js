@@ -119,5 +119,6 @@ module.exports = {
   validateUpdateTask,
   validateDueDate,
   validateStatus,
-  validateCountStatus
+  validateCountStatus,
+  validatePriority
 };

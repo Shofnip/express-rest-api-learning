@@ -1,5 +1,5 @@
 const taskService = require('../services/task-service');
-const { validateCreateTask, validateUpdateTask, validateDueDate, validateStatus, validateCountStatus } = require('../utils/validators');
+const { validateCreateTask, validateUpdateTask, validateDueDate, validateStatus, validateCountStatus, validatePriority } = require('../utils/validators');
 
 const create = async (req, res) => {
   try {
@@ -53,6 +53,21 @@ const getByStatus = async (req, res) => {
     res.json(tasks);
   } catch (error) {
     res.status(500).json({ error: 'Erro ao buscar tarefas por status' });
+  }
+};
+
+const getByPriority = async (req, res) => {
+  try {
+    console.error('[getByPriority] Called with priority:', req.params.priority);
+    const validation = validatePriority(req.params.priority);
+    if (!validation.isValid) {
+      return res.status(400).json({ error: validation.error });
+    }
+
+    const tasks = taskService.getByPriority(req.params.priority);
+    res.json(tasks);
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao buscar tarefas por prioridade' });
   }
 };
 
@@ -170,4 +185,4 @@ const remove = async (req, res) => {
   }
 };
 
-module.exports = { create, list, count, getByStatus, getById, update, markAsCompleted, setDueDate, remove };
+module.exports = { create, list, count, getByStatus, getByPriority, getById, update, markAsCompleted, setDueDate, remove };

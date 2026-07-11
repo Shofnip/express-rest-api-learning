@@ -555,6 +555,64 @@ curl http://localhost:3000/api/tasks/count?status=completed
 
 ---
 
+## 10. GET /api/tasks/priority/:priority — Listar tarefas por prioridade
+
+Retorna um array com as tarefas filtradas pela prioridade informada.
+
+### Parâmetros
+
+**Path Parameters**
+- `priority` (string, obrigatório) — Prioridade para filtrar as tarefas. Valores aceitos: `low`, `medium` ou `high`.
+
+### Exemplo de Request
+
+```bash
+curl http://localhost:3000/api/tasks/priority/high
+```
+
+### Exemplo de Response (200 OK)
+
+```json
+[
+  {
+    "id": 1,
+    "title": "Aprender Express",
+    "description": "",
+    "completed": true,
+    "priority": "high",
+    "dueDate": null,
+    "createdAt": "2026-07-10T13:01:19.172Z"
+  },
+  {
+    "id": 3,
+    "title": "Tarefa urgente",
+    "description": "Algo importante",
+    "completed": false,
+    "priority": "high",
+    "dueDate": null,
+    "createdAt": "2026-07-10T13:05:00.000Z"
+  }
+]
+```
+
+### Possíveis Respostas de Erro
+
+**400 Bad Request** — Prioridade inválida
+```json
+{
+  "error": "Prioridade inválida. Use \"low\", \"medium\" ou \"high\"."
+}
+```
+
+**500 Internal Server Error** — Erro do servidor
+```json
+{
+  "error": "Erro ao buscar tarefas por prioridade"
+}
+```
+
+---
+
 ## Códigos de Status HTTP
 
 | Status | Significado | Casos de Uso |

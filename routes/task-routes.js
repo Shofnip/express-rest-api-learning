@@ -6,6 +6,7 @@ const router = express.Router();
 router.post('/', taskController.create);
 router.get('/', taskController.list);
 router.get('/status/:status', taskController.getByStatus);
+router.get('/priority/:priority', taskController.getByPriority);
 router.get('/count', taskController.count);
 router.get('/:id', taskController.getById);
 router.put('/:id', taskController.update);
