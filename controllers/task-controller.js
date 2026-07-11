@@ -58,13 +58,12 @@ const getByStatus = async (req, res) => {
 
 const getByPriority = async (req, res) => {
   try {
-    console.error('[getByPriority] Called with priority:', req.params.priority);
-    const validation = validatePriority(req.params.priority);
+    const validation = validatePriority(req.params.level);
     if (!validation.isValid) {
       return res.status(400).json({ error: validation.error });
     }
 
-    const tasks = taskService.getByPriority(req.params.priority);
+    const tasks = taskService.getByPriority(req.params.level);
     res.json(tasks);
   } catch (error) {
     res.status(500).json({ error: 'Erro ao buscar tarefas por prioridade' });
