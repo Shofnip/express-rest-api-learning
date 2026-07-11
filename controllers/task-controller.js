@@ -9,7 +9,7 @@ const create = async (req, res) => {
     }
 
     const task = taskService.save(req.body);
-    res.status(201).json(task);
+    res.status(201).json({...task});
   } catch (error) {
     res.status(500).json({ error: 'Erro ao criar tarefa' });
   }
