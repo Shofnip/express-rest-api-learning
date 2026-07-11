@@ -12,6 +12,7 @@ const save = (taskData) => {
     description: taskData.description ? taskData.description.trim() : '',
     completed: taskData.completed || false,
     priority: taskData.priority || null,
+    tags: taskData.tags || [],
     dueDate: null,
     createdAt: new Date().toISOString()
   };
@@ -52,6 +53,10 @@ const updateById = (id, updates) => {
 
   if (updates.priority !== undefined) {
     task.priority = updates.priority;
+  }
+
+  if (updates.tags !== undefined) {
+    task.tags = updates.tags;
   }
 
   return task;

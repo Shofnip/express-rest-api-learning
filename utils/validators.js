@@ -1,5 +1,7 @@
 const MAX_TITLE_LENGTH = 255;
 const MAX_DESCRIPTION_LENGTH = 2000;
+const MAX_TAGS = 10;
+const MAX_TAG_LENGTH = 50;
 
 const validateTitle = (title) => {
   if (!title || title.trim().length === 0) {
@@ -45,6 +47,13 @@ const validateCreateTask = (body) => {
     }
   }
 
+  if (body.tags !== undefined && body.tags !== null) {
+    const tagsValidation = validateTags(body.tags);
+    if (!tagsValidation.isValid) {
+      return tagsValidation;
+    }
+  }
+
   return { isValid: true };
 };
 
@@ -67,6 +76,13 @@ const validateUpdateTask = (body) => {
     const priorityValidation = validatePriority(body.priority);
     if (!priorityValidation.isValid) {
       return priorityValidation;
+    }
+  }
+
+  if (body.tags !== undefined && body.tags !== null) {
+    const tagsValidation = validateTags(body.tags);
+    if (!tagsValidation.isValid) {
+      return tagsValidation;
     }
   }
 
@@ -96,6 +112,32 @@ const validatePriority = (priority) => {
   return { isValid: true };
 };
 
+const validateTags = (tags) => {
+  if (!Array.isArray(tags)) {
+    return { isValid: false, error: 'As tags devem ser um array de strings.' };
+  }
+
+  if (tags.length > MAX_TAGS) {
+    return { isValid: false, error: `Máximo ${MAX_TAGS} tags permitidas.` };
+  }
+
+  for (const tag of tags) {
+    if (typeof tag !== 'string') {
+      return { isValid: false, error: 'Cada tag deve ser uma string.' };
+    }
+
+    if (tag.trim().length === 0) {
+      return { isValid: false, error: 'Tags não podem ser vazias.' };
+    }
+
+    if (tag.length > MAX_TAG_LENGTH) {
+      return { isValid: false, error: `Cada tag não pode exceder ${MAX_TAG_LENGTH} caracteres.` };
+    }
+  }
+
+  return { isValid: true };
+};
+
 const VALID_STATUSES = ['completed', 'pending'];
 
 const validateStatus = (status) => {
@@ -120,5 +162,6 @@ module.exports = {
   validateDueDate,
   validateStatus,
   validateCountStatus,
-  validatePriority
+  validatePriority,
+  validateTags
 };

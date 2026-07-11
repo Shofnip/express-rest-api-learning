@@ -52,6 +52,61 @@ Content-Type: application/json
   "title": "Tarefa sem prioridade definida"
 }
 
+### ========== TAGS ==========
+
+### Criar tarefa com tags
+POST {{baseUrl}}/tasks
+Content-Type: application/json
+
+{
+  "title": "Tarefa com tags",
+  "description": "Exemplo de tarefa com multiple tags",
+  "tags": ["importante", "urgente"]
+}
+
+### Criar tarefa sem tags (valor padrão: array vazio)
+POST {{baseUrl}}/tasks
+Content-Type: application/json
+
+{
+  "title": "Tarefa sem tags"
+}
+
+### Atualizar tags de uma tarefa
+PUT {{baseUrl}}/tasks/1
+Content-Type: application/json
+
+{
+  "tags": ["aprendizado", "framework", "nodejs"]
+}
+
+### Tentar criar tarefa com muitas tags (erro)
+POST {{baseUrl}}/tasks
+Content-Type: application/json
+
+{
+  "title": "Tarefa com muitas tags",
+  "tags": ["tag1", "tag2", "tag3", "tag4", "tag5", "tag6", "tag7", "tag8", "tag9", "tag10", "tag11"]
+}
+
+### Tentar criar tarefa com tag muito longa (erro)
+POST {{baseUrl}}/tasks
+Content-Type: application/json
+
+{
+  "title": "Tarefa com tag longa",
+  "tags": ["esta_é_uma_tag_extremamente_longa_que_excede_o_limite_de_50_caracteres_permitidos"]
+}
+
+### Tentar criar tarefa com tags não sendo array (erro)
+POST {{baseUrl}}/tasks
+Content-Type: application/json
+
+{
+  "title": "Tarefa com tags inválidas",
+  "tags": "não_é_um_array"
+}
+
 ### Atualizar prioridade da tarefa 1 via PUT
 PUT {{baseUrl}}/tasks/1
 Content-Type: application/json

@@ -15,6 +15,7 @@ Cria uma nova tarefa com os dados fornecidos.
 - `description` (string, opcional) — Descrição da tarefa. Máximo 2000 caracteres. Padrão: string vazia.
 - `completed` (boolean, opcional) — Status de conclusão. Padrão: `false`.
 - `priority` (string, opcional) — Prioridade da tarefa. Valores aceitos: `low`, `medium` ou `high`. Padrão: `null`.
+- `tags` (string[], opcional) — Array de tags. Máximo 10 tags, cada uma com máximo 50 caracteres. Padrão: `[]`.
 
 ### Exemplo de Request
 
@@ -39,6 +40,7 @@ curl -X POST http://localhost:3000/api/tasks \
   "completed": false,
   "dueDate": null,
   "priority": "high",
+  "tags": ["framework", "backend"],
   "createdAt": "2026-07-10T13:07:32.243Z"
 }
 ```
@@ -70,6 +72,27 @@ curl -X POST http://localhost:3000/api/tasks \
 ```json
 {
   "error": "Prioridade inválida. Use \"low\", \"medium\" ou \"high\"."
+}
+```
+
+**400 Bad Request** — Tags inválidas
+```json
+{
+  "error": "As tags devem ser um array de strings."
+}
+```
+
+**400 Bad Request** — Muitas tags
+```json
+{
+  "error": "Máximo 10 tags permitidas."
+}
+```
+
+**400 Bad Request** — Tag muito longa
+```json
+{
+  "error": "Cada tag não pode exceder 50 caracteres."
 }
 ```
 
@@ -107,6 +130,7 @@ curl http://localhost:3000/api/tasks
     "completed": true,
     "dueDate": null,
     "priority": "medium",
+    "tags": ["framework"],
     "createdAt": "2026-07-10T13:01:19.172Z"
   },
   {
@@ -116,6 +140,7 @@ curl http://localhost:3000/api/tasks
     "completed": false,
     "dueDate": "2026-08-15T18:00:00Z",
     "priority": null,
+    "tags": [],
     "createdAt": "2026-07-10T13:02:53.676Z"
   }
 ]
@@ -158,6 +183,7 @@ curl http://localhost:3000/api/tasks/status/completed
     "completed": true,
     "dueDate": null,
     "priority": "medium",
+    "tags": ["framework"],
     "createdAt": "2026-07-10T13:01:19.172Z"
   }
 ]
@@ -206,6 +232,7 @@ curl http://localhost:3000/api/tasks/7
   "completed": false,
   "dueDate": null,
   "priority": null,
+  "tags": [],
   "createdAt": "2026-07-10T13:07:32.243Z"
 }
 ```
@@ -249,6 +276,7 @@ Atualiza parcialmente uma tarefa existente. Apenas os campos fornecidos serão a
 - `description` (string, opcional) — Nova descrição. Máximo 2000 caracteres.
 - `completed` (boolean, opcional) — Novo status de conclusão.
 - `priority` (string, opcional) — Nova prioridade. Valores aceitos: `low`, `medium` ou `high`.
+- `tags` (string[], opcional) — Novas tags. Máximo 10 tags, cada uma com máximo 50 caracteres.
 
 **Nota:** Os campos `id` e `createdAt` não podem ser atualizados.
 
@@ -260,7 +288,8 @@ curl -X PUT http://localhost:3000/api/tasks/7 \
   -d '{
     "title": "Estudar Express - Avançado",
     "completed": true,
-    "priority": "low"
+    "priority": "low",
+    "tags": ["framework", "node.js"]
   }'
 ```
 
@@ -274,6 +303,7 @@ curl -X PUT http://localhost:3000/api/tasks/7 \
   "completed": true,
   "dueDate": null,
   "priority": "low",
+  "tags": ["framework", "node.js"],
   "createdAt": "2026-07-10T13:07:32.243Z"
 }
 ```
@@ -305,6 +335,20 @@ curl -X PUT http://localhost:3000/api/tasks/7 \
 ```json
 {
   "error": "Prioridade inválida. Use \"low\", \"medium\" ou \"high\"."
+}
+```
+
+**400 Bad Request** — Tags inválidas
+```json
+{
+  "error": "As tags devem ser um array de strings."
+}
+```
+
+**400 Bad Request** — Muitas tags
+```json
+{
+  "error": "Máximo 10 tags permitidas."
 }
 ```
 
@@ -353,6 +397,7 @@ curl -X PATCH http://localhost:3000/api/tasks/4/complete \
   "completed": true,
   "dueDate": null,
   "priority": null,
+  "tags": [],
   "createdAt": "2026-07-10T13:01:19.172Z"
 }
 ```
@@ -414,7 +459,8 @@ curl -X PATCH http://localhost:3000/api/tasks/5/due-date \
   "completed": false,
   "createdAt": "2026-07-10T13:02:53.676Z",
   "dueDate": "2026-08-15T18:00:00Z",
-  "priority": null
+  "priority": null,
+  "tags": []
 }
 ```
 
@@ -484,6 +530,7 @@ curl -X DELETE http://localhost:3000/api/tasks/6
     "completed": false,
     "dueDate": null,
     "priority": null,
+    "tags": [],
     "createdAt": "2026-07-10T13:02:53.696Z"
   }
 }
@@ -581,6 +628,7 @@ curl http://localhost:3000/api/tasks/priority/high
     "completed": true,
     "priority": "high",
     "dueDate": null,
+    "tags": ["framework"],
     "createdAt": "2026-07-10T13:01:19.172Z"
   },
   {
@@ -590,6 +638,7 @@ curl http://localhost:3000/api/tasks/priority/high
     "completed": false,
     "priority": "high",
     "dueDate": null,
+    "tags": ["urgente", "backend"],
     "createdAt": "2026-07-10T13:05:00.000Z"
   }
 ]
@@ -649,6 +698,7 @@ Cada tarefa possui a seguinte estrutura:
   completed: boolean,            // Opcional, padrão: false
   dueDate: string (ISO 8601),   // Opcional, padrão: null (pode ser adicionado via PATCH)
   priority: string,              // Opcional, um de "low" | "medium" | "high", padrão: null
+  tags: string[],                // Opcional, array de strings max 10 items cada um max 50 chars, padrão: []
   createdAt: string (ISO 8601)   // Auto-setado, não editável
 }
 ```

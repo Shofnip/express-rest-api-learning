@@ -148,6 +148,7 @@ Tasks stored with auto-incrementing IDs:
   completed: boolean,         // optional, defaults to false
   dueDate: ISO8601 string     // optional, defaults to null
   priority: string            // optional, one of 'low' | 'medium' | 'high', defaults to null
+  tags: string[]              // optional, array of strings max 10 items, each max 50 chars, defaults to []
   createdAt: ISO8601 string   // auto-set on creation
 }
 ```
@@ -186,7 +187,14 @@ Tasks stored with auto-incrementing IDs:
    - Can be set on creation (POST) or updated via PUT `/api/tasks/:id`
    - Any other value is rejected with a validation error
 
-7. **Error Responses**
+7. **Task Tags (optional)**
+   - Array of strings, maximum 10 tags
+   - Each tag must be between 1 and 50 characters
+   - Defaults to `[]` (empty array) on creation
+   - Can be set on creation (POST) or updated via PUT `/api/tasks/:id`
+   - Invalid format (non-array, too many items, oversized strings) rejected with validation error
+
+8. **Error Responses**
    - Use consistent format: `{ error: "message" }` or `{ errors: [{ field: "error" }] }`
    - HTTP 400 — validation error (missing/invalid fields)
    - HTTP 404 — resource not found
