@@ -1,5 +1,5 @@
 const taskService = require('../services/task-service');
-const { validateCreateTask, validateUpdateTask, validateDueDate } = require('../utils/validators');
+const { validateCreateTask, validateUpdateTask, validateDueDate, validateStatus, validateCountStatus } = require('../utils/validators');
 
 const create = async (req, res) => {
   try {
@@ -24,9 +24,46 @@ const list = async (req, res) => {
   }
 };
 
+const count = async (req, res) => {
+  try {
+    const { status } = req.query;
+
+    const validation = validateCountStatus(status);
+    if (!validation.isValid) {
+      return res.status(400).json({ error: validation.error });
+    }
+
+    const completed = status === undefined ? undefined : status === 'completed';
+    const total = taskService.count(completed);
+    res.json({ count: total });
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao contar tarefas' });
+  }
+};
+
+const getByStatus = async (req, res) => {
+  try {
+    const validation = validateStatus(req.params.status);
+    if (!validation.isValid) {
+      return res.status(400).json({ error: validation.error });
+    }
+
+    const completed = req.params.status === 'completed';
+    const tasks = taskService.getByStatus(completed);
+    res.json(tasks);
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao buscar tarefas por status' });
+  }
+};
+
 const getById = async (req, res) => {
   try {
     const taskId = parseInt(req.params.id);
+
+    if (isNaN(taskId)) {
+      return res.status(400).json({ error: 'ID inválido. Use um número inteiro.' });
+    }
+
     const task = taskService.getById(taskId);
 
     if (!task) {
@@ -41,12 +78,21 @@ const getById = async (req, res) => {
 
 const update = async (req, res) => {
   try {
+    const taskId = parseInt(req.params.id);
+
+    if (isNaN(taskId)) {
+      return res.status(400).json({ error: 'ID inválido. Use um número inteiro.' });
+    }
+
+    if (req.body.id !== undefined || req.body.createdAt !== undefined) {
+      return res.status(400).json({ error: 'Não é permitido atualizar id ou createdAt.' });
+    }
+
     const validation = validateUpdateTask(req.body);
     if (!validation.isValid) {
       return res.status(400).json({ error: validation.error });
     }
 
-    const taskId = parseInt(req.params.id);
     const task = taskService.updateById(taskId, req.body);
 
     if (!task) {
@@ -62,6 +108,11 @@ const update = async (req, res) => {
 const markAsCompleted = async (req, res) => {
   try {
     const taskId = parseInt(req.params.id);
+
+    if (isNaN(taskId)) {
+      return res.status(400).json({ error: 'ID inválido. Use um número inteiro.' });
+    }
+
     const task = taskService.markAsCompleted(taskId);
 
     if (!task) {
@@ -76,12 +127,17 @@ const markAsCompleted = async (req, res) => {
 
 const setDueDate = async (req, res) => {
   try {
+    const taskId = parseInt(req.params.id);
+
+    if (isNaN(taskId)) {
+      return res.status(400).json({ error: 'ID inválido. Use um número inteiro.' });
+    }
+
     const validation = validateDueDate(req.body.dueDate);
     if (!validation.isValid) {
       return res.status(400).json({ error: validation.error });
     }
 
-    const taskId = parseInt(req.params.id);
     const task = taskService.setDueDate(taskId, req.body.dueDate);
 
     if (!task) {
@@ -97,6 +153,11 @@ const setDueDate = async (req, res) => {
 const remove = async (req, res) => {
   try {
     const taskId = parseInt(req.params.id);
+
+    if (isNaN(taskId)) {
+      return res.status(400).json({ error: 'ID inválido. Use um número inteiro.' });
+    }
+
     const task = taskService.deleteById(taskId);
 
     if (!task) {
@@ -109,4 +170,4 @@ const remove = async (req, res) => {
   }
 };
 
-module.exports = { create, list, getById, update, markAsCompleted, setDueDate, remove };
+module.exports = { create, list, count, getByStatus, getById, update, markAsCompleted, setDueDate, remove };

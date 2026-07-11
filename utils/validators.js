@@ -38,6 +38,13 @@ const validateCreateTask = (body) => {
     }
   }
 
+  if (body.priority !== undefined && body.priority !== null) {
+    const priorityValidation = validatePriority(body.priority);
+    if (!priorityValidation.isValid) {
+      return priorityValidation;
+    }
+  }
+
   return { isValid: true };
 };
 
@@ -53,6 +60,13 @@ const validateUpdateTask = (body) => {
     const descriptionValidation = validateDescription(body.description);
     if (!descriptionValidation.isValid) {
       return descriptionValidation;
+    }
+  }
+
+  if (body.priority !== undefined && body.priority !== null) {
+    const priorityValidation = validatePriority(body.priority);
+    if (!priorityValidation.isValid) {
+      return priorityValidation;
     }
   }
 
@@ -72,8 +86,38 @@ const validateDueDate = (dueDate) => {
   return { isValid: true };
 };
 
+const VALID_PRIORITIES = ['low', 'medium', 'high'];
+
+const validatePriority = (priority) => {
+  if (!VALID_PRIORITIES.includes(priority)) {
+    return { isValid: false, error: 'Prioridade inválida. Use "low", "medium" ou "high".' };
+  }
+
+  return { isValid: true };
+};
+
+const VALID_STATUSES = ['completed', 'pending'];
+
+const validateStatus = (status) => {
+  if (!VALID_STATUSES.includes(status)) {
+    return { isValid: false, error: 'Status inválido. Use "completed" ou "pending".' };
+  }
+
+  return { isValid: true };
+};
+
+const validateCountStatus = (status) => {
+  if (status === undefined) {
+    return { isValid: true };
+  }
+
+  return validateStatus(status);
+};
+
 module.exports = {
   validateCreateTask,
   validateUpdateTask,
-  validateDueDate
+  validateDueDate,
+  validateStatus,
+  validateCountStatus
 };

@@ -146,6 +146,8 @@ Tasks stored with auto-incrementing IDs:
   title: string,              // required, user-facing name can be "título"
   description: string,        // optional, defaults to ''
   completed: boolean,         // optional, defaults to false
+  dueDate: ISO8601 string     // optional, defaults to null
+  priority: string            // optional, one of 'low' | 'medium' | 'high', defaults to null
   createdAt: ISO8601 string   // auto-set on creation
 }
 ```
@@ -172,7 +174,19 @@ Tasks stored with auto-incrementing IDs:
    - Return 404 when task ID not found
    - List endpoint returns empty array if no tasks exist
 
-5. **Error Responses**
+5. **Task Due Date (optional)**
+   - Format: ISO 8601 string (ex: `2026-08-15T18:00:00Z`)
+   - Defaults to `null` on creation
+   - Can be added/updated via PATCH `/api/tasks/:id/due-date`
+   - Any valid date is accepted (past or future)
+
+6. **Task Priority (optional)**
+   - Accepted values: `low`, `medium`, `high`
+   - Defaults to `null` on creation (no priority set)
+   - Can be set on creation (POST) or updated via PUT `/api/tasks/:id`
+   - Any other value is rejected with a validation error
+
+7. **Error Responses**
    - Use consistent format: `{ error: "message" }` or `{ errors: [{ field: "error" }] }`
    - HTTP 400 — validation error (missing/invalid fields)
    - HTTP 404 — resource not found
@@ -180,13 +194,7 @@ Tasks stored with auto-incrementing IDs:
 
 ## REST Endpoints
 
-All endpoints use `/api/tasks` prefix:
-
-- **POST /api/tasks** — Create task. Requires `title`.
-- **GET /api/tasks** — List all tasks.
-- **GET /api/tasks/:id** — Fetch task by ID.
-- **PUT /api/tasks/:id** — Update task (partial updates allowed).
-- **DELETE /api/tasks/:id** — Delete task.
+Consulte @API.md para a documentação completa de todos os endpoints.
 
 ## Adding Features
 
@@ -196,6 +204,7 @@ All endpoints use `/api/tasks` prefix:
 3. Extract reusable logic to `services/task-service.js` if needed
 4. Add validation in middleware or at controller start
 5. Follow async/await pattern, return proper HTTP status codes
+6. Documentar o novo endpoint em API.md, seguindo o padrão de formatação já utilizado no arquivo.
 
 ### New Task Field
 1. Add to data model definition in this file

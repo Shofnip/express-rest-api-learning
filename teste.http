@@ -33,10 +33,71 @@ Content-Type: application/json
   "description": "Validar todas as rotas da API"
 }
 
+### ========== PRIORIDADE ==========
+
+### Criar tarefa com prioridade alta
+POST {{baseUrl}}/tasks
+Content-Type: application/json
+
+{
+  "title": "Corrigir bug em produção",
+  "priority": "high"
+}
+
+### Criar tarefa sem prioridade (fica null)
+POST {{baseUrl}}/tasks
+Content-Type: application/json
+
+{
+  "title": "Tarefa sem prioridade definida"
+}
+
+### Atualizar prioridade da tarefa 1 via PUT
+PUT {{baseUrl}}/tasks/1
+Content-Type: application/json
+
+{
+  "priority": "medium"
+}
+
+### Tentar criar tarefa com prioridade inválida (erro)
+POST {{baseUrl}}/tasks
+Content-Type: application/json
+
+{
+  "title": "Tarefa com prioridade inválida",
+  "priority": "urgente"
+}
+
 ### ========== LISTAR TAREFAS ==========
 
 ### Listar todas as tarefas
 GET {{baseUrl}}/tasks
+
+### ========== LISTAR POR STATUS ==========
+
+### Listar tarefas concluídas
+GET {{baseUrl}}/tasks/status/completed
+
+### Listar tarefas pendentes
+GET {{baseUrl}}/tasks/status/pending
+
+### Tentar listar com status inválido (erro)
+GET {{baseUrl}}/tasks/status/invalido
+
+### ========== CONTAR TAREFAS ==========
+
+### Contar todas as tarefas
+GET {{baseUrl}}/tasks/count
+
+### Contar tarefas concluídas
+GET {{baseUrl}}/tasks/count?status=completed
+
+### Contar tarefas pendentes
+GET {{baseUrl}}/tasks/count?status=pending
+
+### Tentar contar com status inválido (erro)
+GET {{baseUrl}}/tasks/count?status=invalido
 
 ### ========== BUSCAR POR ID ==========
 
@@ -81,7 +142,7 @@ Content-Type: application/json
 
 ### ========== MARCAR COMO CONCLUÍDO ==========
 
-### Marcar tarefa 1 como concluída (nova rota)
+### Marcar tarefa 1 como concluída
 PATCH {{baseUrl}}/tasks/1/complete
 
 ### Marcar tarefa 3 como concluída
