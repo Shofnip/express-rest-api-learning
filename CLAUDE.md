@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**express-rest-api-learning** is an educational REST API for managing tasks built with Express.js. Data is stored in-memory (no database), making it suitable for prototyping and learning Express fundamentals. The project demonstrates proper structure and Claude Code workflow best practices.
+**express-rest-api-learning** is an educational REST API for managing tasks built with Express.js. Data is persisted to a local SQLite database via `better-sqlite3` (see [State & Persistence](#state--persistence)). The project demonstrates proper structure and Claude Code workflow best practices.
 
 ## Quick Start
 
