@@ -45,6 +45,7 @@ function createTask(req, res) {
 - **Variables & Functions**: Use `camelCase` in code (e.g., `taskId`, `createTask()`)
 - **Constants**: Use `UPPER_SNAKE_CASE` (e.g., `MAX_TASK_LENGTH`)
 - **All technical names in English** — only comments and user-facing messages in Portuguese
+- This applies to **every file in the project**, not just source code — database files, config files, scripts, and any other artifact created for the project (e.g., `tasks.db`, not `tarefas.db`)
 
 ```javascript
 // ✅ Good

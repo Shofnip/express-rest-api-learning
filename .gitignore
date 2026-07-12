@@ -16,5 +16,9 @@ node_modules/
 # Logs
 *.log
 
+# SQLite database (local MCP server data)
+*.db
+*.db-journal
+
 # Claude Code
 .claude/settings.local.json
