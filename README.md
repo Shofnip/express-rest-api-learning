@@ -14,7 +14,7 @@ Este projeto é um **objeto de estudo** para aprender, na prática, as funcional
 | 1 | CLAUDE.md | Documentar convenções e regras do projeto; CLAUDE.md enxuto (< 200 linhas) + Rules + arquivos externos referenciados | ✅ Concluído |
 | 2 | Skills | Criar e instalar Skills (`add-endpoint`, `add-field`) para automatizar workflows repetitivos | ✅ Concluído |
 | 3 | MCP | Conectar serviços externos (SQLite para persistência real, GitHub para issues/PRs) | ✅ Concluído |
-| 4 | Code Intelligence | Navegação por símbolos e refactor guiado (`completed` para `isCompleted`) | 🔄 Em finalização (auditoria em andamento) |
+| 4 | Code Intelligence | Navegação por símbolos e refactor guiado (`completed` para `isCompleted`) | ✅ Concluído |
 | 5 | Subagents | Delegar tarefas isoladas — usar a issue "Criar testes automatizados" já reservada | ⏳ Pendente |
 | 6 | Hooks | Automação determinística (lint, bloqueio de `.env`, garantir documentação/Skills sincronizadas) | ⏳ Pendente |
 | 7 | Agent Teams | Múltiplos agentes coordenados (conecta com Agent View descoberto no Projeto 2) | ⏳ Pendente |
