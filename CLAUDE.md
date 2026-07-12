@@ -189,10 +189,14 @@ validação e documentação em API.md.
 
 ## State & Persistence
 
-Data is in-memory and lost on server restart. This is intentional for prototyping.
+Data is persisted to a local SQLite database (`tasks.db`, gitignored) via `better-sqlite3`.
+Connection setup and table creation live in `services/db.js`; `services/task-service.js`
+runs real SQL queries instead of mutating an in-memory array.
 
-**To add database persistence:**
-1. Replace in-memory array with database queries in `services/task-service.js`
-2. Keep controller signatures unchanged
-3. Add error handling for database operations (async/await try/catch)
-4. Controllers remain unchanged if service interface is consistent
+`better-sqlite3` is fully synchronous, so `task-service.js` methods stay synchronous
+functions (no `async`/`await`) — there is no asynchronous I/O to await. Controllers call
+them exactly as before.
+
+The MCP `sqlite` server configured in `.mcp.json` points at the same `tasks.db` file. It
+exists only so Claude Code can inspect/query the database directly during development —
+it is not part of the app's runtime request path.

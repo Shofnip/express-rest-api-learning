@@ -16,9 +16,11 @@ node_modules/
 # Logs
 *.log
 
-# SQLite database (local MCP server data)
+# SQLite database
 *.db
 *.db-journal
+*.db-wal
+*.db-shm
 
 # Claude Code
 .claude/settings.local.json

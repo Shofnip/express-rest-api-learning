@@ -1,37 +1,53 @@
-let tasks = [];
-let nextId = 1;
+const db = require('./db');
 
-const findById = (id) => tasks.find(t => t.id === id);
+const rowToTask = (row) => ({
+  id: row.id,
+  title: row.title,
+  description: row.description,
+  completed: row.completed === 1,
+  dueDate: row.due_date,
+  priority: row.priority,
+  tags: JSON.parse(row.tags),
+  createdAt: row.created_at
+});
 
-const findIndexById = (id) => tasks.findIndex(t => t.id === id);
-
-const save = (taskData) => {
-  const newTask = {
-    id: nextId++,
-    title: taskData.title.trim(),
-    description: taskData.description ? taskData.description.trim() : '',
-    completed: taskData.completed || false,
-    priority: taskData.priority || null,
-    tags: taskData.tags || [],
-    dueDate: null,
-    createdAt: new Date().toISOString()
-  };
-
-  tasks.push(newTask);
-  return newTask;
+const findById = (id) => {
+  const row = db.prepare('SELECT * FROM tasks WHERE id = ?').get(id);
+  return row ? rowToTask(row) : undefined;
 };
 
-const getAll = () => tasks;
+const save = (taskData) => {
+  const title = taskData.title.trim();
+  const description = taskData.description ? taskData.description.trim() : '';
+  const completed = taskData.completed || false;
+  const priority = taskData.priority || null;
+  const tags = taskData.tags || [];
+  const createdAt = new Date().toISOString();
+
+  const result = db.prepare(`
+    INSERT INTO tasks (title, description, completed, due_date, priority, tags, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+  `).run(title, description, completed ? 1 : 0, null, priority, JSON.stringify(tags), createdAt);
+
+  return findById(result.lastInsertRowid);
+};
+
+const getAll = () => db.prepare('SELECT * FROM tasks').all().map(rowToTask);
 
 const getById = (id) => findById(id);
 
-const getByStatus = (completed) => tasks.filter(t => t.completed === completed);
+const getByStatus = (completed) =>
+  db.prepare('SELECT * FROM tasks WHERE completed = ?').all(completed ? 1 : 0).map(rowToTask);
 
-const getByPriority = (priority) => tasks.filter(t => t.priority === priority);
+const getByPriority = (priority) =>
+  db.prepare('SELECT * FROM tasks WHERE priority = ?').all(priority).map(rowToTask);
 
 const count = (completed) => {
-  if (completed === undefined) return tasks.length;
-  return getByStatus(completed).length;
+  if (completed === undefined) {
+    return db.prepare('SELECT COUNT(*) as total FROM tasks').get().total;
+  }
+
+  return db.prepare('SELECT COUNT(*) as total FROM tasks WHERE completed = ?').get(completed ? 1 : 0).total;
 };
 
 const updateById = (id, updates) => {
@@ -39,27 +55,40 @@ const updateById = (id, updates) => {
 
   if (!task) return null;
 
+  const fields = [];
+  const values = [];
+
   if (updates.title !== undefined) {
-    task.title = updates.title.trim();
+    fields.push('title = ?');
+    values.push(updates.title.trim());
   }
 
   if (updates.description !== undefined) {
-    task.description = updates.description.trim();
+    fields.push('description = ?');
+    values.push(updates.description.trim());
   }
 
   if (updates.completed !== undefined) {
-    task.completed = updates.completed;
+    fields.push('completed = ?');
+    values.push(updates.completed ? 1 : 0);
   }
 
   if (updates.priority !== undefined) {
-    task.priority = updates.priority;
+    fields.push('priority = ?');
+    values.push(updates.priority);
   }
 
   if (updates.tags !== undefined) {
-    task.tags = updates.tags;
+    fields.push('tags = ?');
+    values.push(JSON.stringify(updates.tags));
   }
 
-  return task;
+  if (fields.length === 0) return task;
+
+  values.push(id);
+  db.prepare(`UPDATE tasks SET ${fields.join(', ')} WHERE id = ?`).run(...values);
+
+  return findById(id);
 };
 
 const markAsCompleted = (id) => {
@@ -67,8 +96,9 @@ const markAsCompleted = (id) => {
 
   if (!task) return null;
 
-  task.completed = true;
-  return task;
+  db.prepare('UPDATE tasks SET completed = 1 WHERE id = ?').run(id);
+
+  return findById(id);
 };
 
 const setDueDate = (id, dueDate) => {
@@ -76,17 +106,19 @@ const setDueDate = (id, dueDate) => {
 
   if (!task) return null;
 
-  task.dueDate = dueDate;
-  return task;
+  db.prepare('UPDATE tasks SET due_date = ? WHERE id = ?').run(dueDate, id);
+
+  return findById(id);
 };
 
 const deleteById = (id) => {
-  const index = findIndexById(id);
+  const task = findById(id);
 
-  if (index === -1) return null;
+  if (!task) return null;
 
-  const deletedTask = tasks.splice(index, 1);
-  return deletedTask[0];
+  db.prepare('DELETE FROM tasks WHERE id = ?').run(id);
+
+  return task;
 };
 
 module.exports = {
