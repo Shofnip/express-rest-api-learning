@@ -153,52 +153,9 @@ Tasks stored with auto-incrementing IDs:
 }
 ```
 
-## Business Rules
+## API Design & Business Rules
 
-1. **Task Creation**
-   - `title` is required and must be non-empty (trim whitespace)
-   - `title` max length: 255 characters
-   - `description` max length: 2000 characters
-   - `completed` defaults to `false`
-   - `createdAt` automatically set to current timestamp (ISO 8601)
-
-2. **Task Updates**
-   - All fields are optional; omit to leave unchanged
-   - Cannot update `id` or `createdAt`
-   - Task must exist before updating (return 404 if not found)
-
-3. **Task Deletion**
-   - Task must exist before deletion (return 404 if not found)
-   - Return deleted task object in response for confirmation
-
-4. **Task Retrieval**
-   - Return 404 when task ID not found
-   - List endpoint returns empty array if no tasks exist
-
-5. **Task Due Date (optional)**
-   - Format: ISO 8601 string (ex: `2026-08-15T18:00:00Z`)
-   - Defaults to `null` on creation
-   - Can be added/updated via PATCH `/api/tasks/:id/due-date`
-   - Any valid date is accepted (past or future)
-
-6. **Task Priority (optional)**
-   - Accepted values: `low`, `medium`, `high`
-   - Defaults to `null` on creation (no priority set)
-   - Can be set on creation (POST) or updated via PUT `/api/tasks/:id`
-   - Any other value is rejected with a validation error
-
-7. **Task Tags (optional)**
-   - Array of strings, maximum 10 tags
-   - Each tag must be between 1 and 50 characters
-   - Defaults to `[]` (empty array) on creation
-   - Can be set on creation (POST) or updated via PUT `/api/tasks/:id`
-   - Invalid format (non-array, too many items, oversized strings) rejected with validation error
-
-8. **Error Responses**
-   - Use consistent format: `{ error: "message" }` or `{ errors: [{ field: "error" }] }`
-   - HTTP 400 — validation error (missing/invalid fields)
-   - HTTP 404 — resource not found
-   - HTTP 500 — server error
+API design conventions (business rules, error responses, HTTP status codes) are documented in `.claude/rules/api-design.md`.
 
 ## REST Endpoints
 
