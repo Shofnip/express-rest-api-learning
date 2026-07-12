@@ -2,6 +2,22 @@
 
 Este arquivo documenta todos os endpoints disponíveis na API de Tarefas. Todos os endpoints usam o prefixo `/api/tasks`.
 
+## Referência Rápida
+
+**Para adicionar novos endpoints:** use a skill `/add-endpoint`  
+**Para adicionar novos campos:** use a skill `/add-field`
+
+**Estrutura técnica:**
+- `routes/task-routes.js` — Mapeamento HTTP
+- `controllers/task-controller.js` — Request/response
+- `services/task-service.js` — Lógica de negócio
+- `utils/validators.js` — Validações
+
+**Padrões de resposta:**
+- Sucesso: JSON com os dados da(s) tarefa(s)
+- Erro: `{ "error": "mensagem em português" }`
+- Status HTTP: 200/201 (sucesso), 400 (validação), 404 (não encontrado), 500 (servidor)
+
 ---
 
 ## 1. POST /api/tasks — Criar tarefa

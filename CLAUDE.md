@@ -207,19 +207,12 @@ Consulte @API.md para a documentação completa de todos os endpoints.
 ## Adding Features
 
 ### New Endpoint
-1. Create route handler in `routes/task-routes.js`
-2. Implement logic in `controllers/task-controller.js`
-3. Extract reusable logic to `services/task-service.js` if needed
-4. Add validation in middleware or at controller start
-5. Follow async/await pattern, return proper HTTP status codes
-6. Documentar o novo endpoint em API.md, seguindo o padrão de formatação já utilizado no arquivo.
+Use a Skill `/add-endpoint`, que automatiza criação de rota, controller, 
+validação e documentação em API.md seguindo os padrões deste projeto.
 
 ### New Task Field
-1. Add to data model definition in this file
-2. Add to task initialization in controller
-3. Update validation logic
-4. Add business rules above
-5. Document in README.md
+Use a Skill `/add-field`, que automatiza atualização do Data Model, 
+validação e documentação em API.md.
 
 ### New Middleware
 1. Create file in `middleware/` with kebab-case name
