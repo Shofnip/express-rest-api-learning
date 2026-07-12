@@ -12,7 +12,7 @@ Content-Type: application/json
 {
   "title": "Aprender Express",
   "description": "Estudar o framework Express.js",
-  "completed": false
+  "isCompleted": false
 }
 
 ### Criar tarefa 2
@@ -189,7 +189,7 @@ PUT {{baseUrl}}/tasks/1
 Content-Type: application/json
 
 {
-  "completed": true
+  "isCompleted": true
 }
 
 ### Atualizar título da tarefa 2

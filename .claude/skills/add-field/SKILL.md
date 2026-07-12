@@ -9,7 +9,8 @@ Você vai adicionar um novo campo ao modelo de dados de tarefa. Este processo é
 ## Padrões do Projeto
 
 **Estrutura em camadas:**
-- `services/task-service.js` — Inicialização e atualização de campos
+- `services/db.js` — Schema da tabela SQLite (nova coluna, se aplicável)
+- `services/task-service.js` — Inicialização e atualização de campos (SQL via `better-sqlite3`)
 - `utils/validators.js` — Validações (retorna `{ isValid: boolean, error?: string }`)
 - `API.md` — Documentação em TODOS os endpoints
 
@@ -25,7 +26,7 @@ Você vai adicionar um novo campo ao modelo de dados de tarefa. Este processo é
   id: number,                    // Auto-incrementado
   title: string,                 // Obrigatório, max 255 chars
   description: string,           // Opcional, max 2000 chars, padrão: ""
-  completed: boolean,            // Opcional, padrão: false
+  isCompleted: boolean,          // Opcional, padrão: false
   dueDate: ISO8601 string,       // Opcional, padrão: null
   priority: string,              // Opcional: 'low'|'medium'|'high', padrão: null
   tags: string[],                // Opcional, max 10 tags, cada max 50 chars, padrão: []
@@ -54,20 +55,29 @@ Se o usuário não informou, pergunte antes de prosseguir:
 
 ## 2. Checklist de implementação (nesta ordem, sem exceção)
 
-### 2.1. services/task-service.js — Inicialização e atualização
+### 2.1. services/db.js — Coluna da tabela
+
+- Adicionar a coluna correspondente ao `CREATE TABLE IF NOT EXISTS tasks (...)`, com o tipo e `DEFAULT` adequados (ex: `is_completed INTEGER NOT NULL DEFAULT 0`)
+- Nome da coluna em `snake_case`; o campo no objeto JS retornado continua em `camelCase` (conversão feita em `rowToTask`)
+
+### 2.2. services/task-service.js — Inicialização e atualização
+
+**Em `rowToTask()`:**
+- Adicionar o campo ao objeto retornado, convertendo o valor da coluna se necessário (ex: `isCompleted: row.is_completed === 1`)
 
 **Em `save()`:**
-- Adicionar campo ao objeto `newTask` com o valor padrão definido
+- Extrair o valor em uma variável com o valor padrão definido (ex: `const <campo> = taskData.<campo> || <padrão>;`)
+- Incluir a coluna no `INSERT INTO tasks (...)` e o valor correspondente no `VALUES (...)`, na mesma posição
 
 **Em `updateById()` (se atualizável via PUT):**
-- Adicionar bloco `if (updates.<campo> !== undefined) { task.<campo> = ...; }`
+- Adicionar bloco `if (updates.<campo> !== undefined) { fields.push('<coluna_sql> = ?'); values.push(...); }`
 - Incluir `.trim()` se for string
 - Replicar padrão dos campos existentes
 
 **Se endpoint dedicado (ex: PATCH próprio):**
 - Usar skill `add-endpoint` para essa parte
 
-### 2.2. utils/validators.js — Validação (se houver restrições)
+### 2.3. utils/validators.js — Validação (se houver restrições)
 
 - Criar função `validateXxx(value)` retornando `{ isValid: boolean, error?: string }`
 - Mensagens em português, tom consistente com validações existentes
@@ -76,13 +86,13 @@ Se o usuário não informou, pergunte antes de prosseguir:
   - `validateUpdateTask()` — se atualizável via PUT (chamar só quando `body.<campo> !== undefined`)
 - Se sem validação além de tipo trivial (ex: booleano simples), não criar função nova
 
-### 2.3. controllers/task-controller.js
+### 2.4. controllers/task-controller.js
 
 - Só alterar se precisar chamar validação nova em handler existente (`create`/`update`)
 - Se endpoint dedicado, usar skill `add-endpoint`
 - Não adicionar lógica de negócio
 
-### 2.4. API.md — Atualizar TODOS os endpoints, sem exceção
+### 2.5. API.md — Atualizar TODOS os endpoints, sem exceção
 
 Revisar **cada seção** explicitamente:
 
@@ -105,7 +115,7 @@ Se campo tiver endpoint dedicado novo:
 
 **Verificação final:** Fazer `grep` por `"id":`, `"title":`, etc. em `API.md` para confirmar que todos os blocos JSON de tarefa têm o novo campo.
 
-### 2.5. teste.http (recomendado)
+### 2.6. teste.http (recomendado)
 
 Sugerir exemplos cobrindo:
 - Criação com o campo
@@ -115,4 +125,4 @@ Sugerir exemplos cobrindo:
 
 ## 3. Depois de implementar
 
-Apresente checklist confirmando cada etapa (2.1–2.5), listando **cada endpoint do API.md** revisado/atualizado — essa é a parte mais fácil de deixar incompleta.
+Apresente checklist confirmando cada etapa (2.1–2.6), listando **cada endpoint do API.md** revisado/atualizado — essa é a parte mais fácil de deixar incompleta.

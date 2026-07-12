@@ -4,7 +4,7 @@ const rowToTask = (row) => ({
   id: row.id,
   title: row.title,
   description: row.description,
-  completed: row.completed === 1,
+  isCompleted: row.is_completed === 1,
   dueDate: row.due_date,
   priority: row.priority,
   tags: JSON.parse(row.tags),
@@ -19,15 +19,15 @@ const findById = (id) => {
 const save = (taskData) => {
   const title = taskData.title.trim();
   const description = taskData.description ? taskData.description.trim() : '';
-  const completed = taskData.completed || false;
+  const isCompleted = taskData.isCompleted || false;
   const priority = taskData.priority || null;
   const tags = taskData.tags || [];
   const createdAt = new Date().toISOString();
 
   const result = db.prepare(`
-    INSERT INTO tasks (title, description, completed, due_date, priority, tags, created_at)
+    INSERT INTO tasks (title, description, is_completed, due_date, priority, tags, created_at)
     VALUES (?, ?, ?, ?, ?, ?, ?)
-  `).run(title, description, completed ? 1 : 0, null, priority, JSON.stringify(tags), createdAt);
+  `).run(title, description, isCompleted ? 1 : 0, null, priority, JSON.stringify(tags), createdAt);
 
   return findById(result.lastInsertRowid);
 };
@@ -36,18 +36,18 @@ const getAll = () => db.prepare('SELECT * FROM tasks').all().map(rowToTask);
 
 const getById = (id) => findById(id);
 
-const getByStatus = (completed) =>
-  db.prepare('SELECT * FROM tasks WHERE completed = ?').all(completed ? 1 : 0).map(rowToTask);
+const getByStatus = (isCompleted) =>
+  db.prepare('SELECT * FROM tasks WHERE is_completed = ?').all(isCompleted ? 1 : 0).map(rowToTask);
 
 const getByPriority = (priority) =>
   db.prepare('SELECT * FROM tasks WHERE priority = ?').all(priority).map(rowToTask);
 
-const count = (completed) => {
-  if (completed === undefined) {
+const count = (isCompleted) => {
+  if (isCompleted === undefined) {
     return db.prepare('SELECT COUNT(*) as total FROM tasks').get().total;
   }
 
-  return db.prepare('SELECT COUNT(*) as total FROM tasks WHERE completed = ?').get(completed ? 1 : 0).total;
+  return db.prepare('SELECT COUNT(*) as total FROM tasks WHERE is_completed = ?').get(isCompleted ? 1 : 0).total;
 };
 
 const updateById = (id, updates) => {
@@ -68,9 +68,9 @@ const updateById = (id, updates) => {
     values.push(updates.description.trim());
   }
 
-  if (updates.completed !== undefined) {
-    fields.push('completed = ?');
-    values.push(updates.completed ? 1 : 0);
+  if (updates.isCompleted !== undefined) {
+    fields.push('is_completed = ?');
+    values.push(updates.isCompleted ? 1 : 0);
   }
 
   if (updates.priority !== undefined) {
@@ -96,7 +96,7 @@ const markAsCompleted = (id) => {
 
   if (!task) return null;
 
-  db.prepare('UPDATE tasks SET completed = 1 WHERE id = ?').run(id);
+  db.prepare('UPDATE tasks SET is_completed = 1 WHERE id = ?').run(id);
 
   return findById(id);
 };

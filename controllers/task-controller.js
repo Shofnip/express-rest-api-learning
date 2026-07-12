@@ -33,8 +33,8 @@ const count = async (req, res) => {
       return res.status(400).json({ error: validation.error });
     }
 
-    const completed = status === undefined ? undefined : status === 'completed';
-    const total = taskService.count(completed);
+    const isCompleted = status === undefined ? undefined : status === 'completed';
+    const total = taskService.count(isCompleted);
     res.json({ count: total });
   } catch (error) {
     res.status(500).json({ error: 'Erro ao contar tarefas' });
@@ -48,8 +48,8 @@ const getByStatus = async (req, res) => {
       return res.status(400).json({ error: validation.error });
     }
 
-    const completed = req.params.status === 'completed';
-    const tasks = taskService.getByStatus(completed);
+    const isCompleted = req.params.status === 'completed';
+    const tasks = taskService.getByStatus(isCompleted);
     res.json(tasks);
   } catch (error) {
     res.status(500).json({ error: 'Erro ao buscar tarefas por status' });

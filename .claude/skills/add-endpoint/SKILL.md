@@ -37,7 +37,7 @@ Você vai criar um novo endpoint REST para a API de tarefas seguindo os padrões
   id: number,                    // Auto-incrementado
   title: string,                 // Obrigatório, max 255 chars
   description: string,           // Opcional, max 2000 chars, padrão: ""
-  completed: boolean,            // Opcional, padrão: false
+  isCompleted: boolean,          // Opcional, padrão: false
   dueDate: ISO8601 string,       // Opcional, padrão: null
   priority: string,              // Opcional: 'low'|'medium'|'high', padrão: null
   tags: string[],                // Opcional, max 10 tags, cada max 50 chars, padrão: []
@@ -70,8 +70,8 @@ Se algo estiver faltando, pergunte antes de prosseguir.
    - Exportar função em `module.exports`
 
 3. **Service** (`services/task-service.js`)
-   - Só se o endpoint precisar manipular array `tasks` ou aplicar regras além de validação simples
-   - Funções puras: recebem `id`/dados, retornam task ou `null` se não encontrada
+   - Só se o endpoint precisar executar queries SQL (via `better-sqlite3`) ou aplicar regras além de validação simples
+   - Funções recebem `id`/dados, retornam task (via `rowToTask`) ou `null` se não encontrada
    - Exportar função
 
 4. **Validação** (`utils/validators.js`)

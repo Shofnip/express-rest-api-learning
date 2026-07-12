@@ -71,7 +71,7 @@ const validarTituloTarefa = () => {}; // File/variable name mixing languages
 
 ```javascript
 // ✅ Good: Clear naming, no comment needed
-const isTaskCompleted = (task) => task.completed === true;
+const isTaskCompleted = (task) => task.isCompleted === true;
 
 const validateTaskTitle = (title) => {
   if (!title.trim().length) {
@@ -86,9 +86,9 @@ const sanitizedTitle = title.trim();
 // ❌ Bad: Excessive/obvious comments
 const isTaskCompleted = (task) => {
   // Check if task is completed
-  // Returns true if task.completed is true
+  // Returns true if task.isCompleted is true
   // Returns false otherwise
-  return task.completed === true;
+  return task.isCompleted === true;
 };
 
 // ❌ Bad: Comment restates the code
@@ -146,7 +146,7 @@ Tasks stored with auto-incrementing IDs:
   id: number,
   title: string,              // required, user-facing name can be "título"
   description: string,        // optional, defaults to ''
-  completed: boolean,         // optional, defaults to false
+  isCompleted: boolean,       // optional, defaults to false
   dueDate: ISO8601 string     // optional, defaults to null
   priority: string            // optional, one of 'low' | 'medium' | 'high', defaults to null
   tags: string[]              // optional, array of strings max 10 items, each max 50 chars, defaults to []

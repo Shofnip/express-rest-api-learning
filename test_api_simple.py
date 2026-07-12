@@ -95,7 +95,7 @@ def test_api():
             )
             assert resp.status == 200
             data = resp.json()
-            assert data["completed"] is True
+            assert data["isCompleted"] is True
             print("[PASS] Task marked as completed\n")
             passed += 1
 

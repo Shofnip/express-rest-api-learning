@@ -10,7 +10,7 @@ db.exec(`
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
     description TEXT NOT NULL DEFAULT '',
-    completed INTEGER NOT NULL DEFAULT 0,
+    is_completed INTEGER NOT NULL DEFAULT 0,
     due_date TEXT,
     priority TEXT,
     tags TEXT NOT NULL DEFAULT '[]',

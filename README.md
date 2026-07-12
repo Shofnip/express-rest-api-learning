@@ -45,7 +45,7 @@ Body (JSON):
 {
   "title": "Minha tarefa",
   "description": "Descrição da tarefa",
-  "completed": false
+  "isCompleted": false
 }
 ```
 
@@ -55,7 +55,7 @@ Resposta (201 Created):
   "id": 1,
   "title": "Minha tarefa",
   "description": "Descrição da tarefa",
-  "completed": false,
+  "isCompleted": false,
   "createdAt": "2026-07-10T10:30:00.000Z"
 }
 ```
@@ -70,7 +70,7 @@ Resposta (200 OK):
     "id": 1,
     "title": "Minha tarefa",
     "description": "Descrição da tarefa",
-    "completed": false,
+    "isCompleted": false,
     "createdAt": "2026-07-10T10:30:00.000Z"
   }
 ]
@@ -85,7 +85,7 @@ Resposta (200 OK):
   "id": 1,
   "title": "Minha tarefa",
   "description": "Descrição da tarefa",
-  "completed": false,
+  "isCompleted": false,
   "createdAt": "2026-07-10T10:30:00.000Z"
 }
 ```
@@ -97,7 +97,7 @@ Body (JSON):
 ```json
 {
   "title": "Tarefa atualizada",
-  "completed": true
+  "isCompleted": true
 }
 ```
 
@@ -107,7 +107,7 @@ Resposta (200 OK):
   "id": 1,
   "title": "Tarefa atualizada",
   "description": "Descrição da tarefa",
-  "completed": true,
+  "isCompleted": true,
   "createdAt": "2026-07-10T10:30:00.000Z"
 }
 ```
@@ -123,7 +123,7 @@ Resposta (200 OK):
     "id": 1,
     "title": "Minha tarefa",
     "description": "Descrição da tarefa",
-    "completed": false,
+    "isCompleted": false,
     "createdAt": "2026-07-10T10:30:00.000Z"
   }
 }
@@ -146,7 +146,7 @@ curl http://localhost:3000/api/tasks/1
 # Atualizar tarefa
 curl -X PUT http://localhost:3000/api/tasks/1 \
   -H "Content-Type: application/json" \
-  -d '{"completed":true}'
+  -d '{"isCompleted":true}'
 
 # Deletar tarefa
 curl -X DELETE http://localhost:3000/api/tasks/1
@@ -157,5 +157,5 @@ curl -X DELETE http://localhost:3000/api/tasks/1
 - Os dados são armazenados em memória (array) e serão perdidos quando o servidor for reiniciado
 - Cada tarefa recebe um ID único incrementado automaticamente
 - O campo `createdAt` é preenchido automaticamente na criação com timestamp ISO 8601
-- Campos opcionais na criação: `description` (padrão: '') e `completed` (padrão: false)
+- Campos opcionais na criação: `description` (padrão: '') e `isCompleted` (padrão: false)
 - Consulte CLAUDE.md para regras de negócio completas e padrões de desenvolvimento

@@ -29,7 +29,7 @@ Cria uma nova tarefa com os dados fornecidos.
 **Body (JSON)**
 - `title` (string, obrigatório) — Título da tarefa. Máximo 255 caracteres. Será trimado automaticamente.
 - `description` (string, opcional) — Descrição da tarefa. Máximo 2000 caracteres. Padrão: string vazia.
-- `completed` (boolean, opcional) — Status de conclusão. Padrão: `false`.
+- `isCompleted` (boolean, opcional) — Status de conclusão. Padrão: `false`.
 - `priority` (string, opcional) — Prioridade da tarefa. Valores aceitos: `low`, `medium` ou `high`. Padrão: `null`.
 - `tags` (string[], opcional) — Array de tags. Máximo 10 tags, cada uma com máximo 50 caracteres. Padrão: `[]`.
 
@@ -41,7 +41,7 @@ curl -X POST http://localhost:3000/api/tasks \
   -d '{
     "title": "Estudar Express",
     "description": "Aprender conceitos de middleware e roteamento",
-    "completed": false,
+    "isCompleted": false,
     "priority": "high"
   }'
 ```
@@ -53,7 +53,7 @@ curl -X POST http://localhost:3000/api/tasks \
   "id": 7,
   "title": "Estudar Express",
   "description": "Aprender conceitos de middleware e roteamento",
-  "completed": false,
+  "isCompleted": false,
   "dueDate": null,
   "priority": "high",
   "tags": ["framework", "backend"],
@@ -143,7 +143,7 @@ curl http://localhost:3000/api/tasks
     "id": 1,
     "title": "Aprender Express",
     "description": "",
-    "completed": true,
+    "isCompleted": true,
     "dueDate": null,
     "priority": "medium",
     "tags": ["framework"],
@@ -153,7 +153,7 @@ curl http://localhost:3000/api/tasks
     "id": 2,
     "title": "Testar endpoints",
     "description": "Verificar funcionamento da API",
-    "completed": false,
+    "isCompleted": false,
     "dueDate": "2026-08-15T18:00:00Z",
     "priority": null,
     "tags": [],
@@ -196,7 +196,7 @@ curl http://localhost:3000/api/tasks/status/completed
     "id": 1,
     "title": "Aprender Express",
     "description": "",
-    "completed": true,
+    "isCompleted": true,
     "dueDate": null,
     "priority": "medium",
     "tags": ["framework"],
@@ -245,7 +245,7 @@ curl http://localhost:3000/api/tasks/7
   "id": 7,
   "title": "Estudar Express",
   "description": "Aprender conceitos de middleware",
-  "completed": false,
+  "isCompleted": false,
   "dueDate": null,
   "priority": null,
   "tags": [],
@@ -290,7 +290,7 @@ Atualiza parcialmente uma tarefa existente. Apenas os campos fornecidos serão a
 **Body (JSON)** — Todos os campos são opcionais
 - `title` (string, opcional) — Novo título. Máximo 255 caracteres.
 - `description` (string, opcional) — Nova descrição. Máximo 2000 caracteres.
-- `completed` (boolean, opcional) — Novo status de conclusão.
+- `isCompleted` (boolean, opcional) — Novo status de conclusão.
 - `priority` (string, opcional) — Nova prioridade. Valores aceitos: `low`, `medium` ou `high`.
 - `tags` (string[], opcional) — Novas tags. Máximo 10 tags, cada uma com máximo 50 caracteres.
 
@@ -303,7 +303,7 @@ curl -X PUT http://localhost:3000/api/tasks/7 \
   -H "Content-Type: application/json" \
   -d '{
     "title": "Estudar Express - Avançado",
-    "completed": true,
+    "isCompleted": true,
     "priority": "low",
     "tags": ["framework", "node.js"]
   }'
@@ -316,7 +316,7 @@ curl -X PUT http://localhost:3000/api/tasks/7 \
   "id": 7,
   "title": "Estudar Express - Avançado",
   "description": "Aprender conceitos de middleware",
-  "completed": true,
+  "isCompleted": true,
   "dueDate": null,
   "priority": "low",
   "tags": ["framework", "node.js"],
@@ -386,7 +386,7 @@ curl -X PUT http://localhost:3000/api/tasks/7 \
 
 ## 6. PATCH /api/tasks/:id/complete — Marcar tarefa como concluída
 
-Marca uma tarefa como concluída (define `completed` como `true`). Operação específica, alternativa ao PUT.
+Marca uma tarefa como concluída (define `isCompleted` como `true`). Operação específica, alternativa ao PUT.
 
 ### Parâmetros
 
@@ -410,7 +410,7 @@ curl -X PATCH http://localhost:3000/api/tasks/4/complete \
   "id": 4,
   "title": "Aprender Express",
   "description": "Estudar fundamentos",
-  "completed": true,
+  "isCompleted": true,
   "dueDate": null,
   "priority": null,
   "tags": [],
@@ -472,7 +472,7 @@ curl -X PATCH http://localhost:3000/api/tasks/5/due-date \
   "id": 5,
   "title": "Minha primeira tarefa",
   "description": "",
-  "completed": false,
+  "isCompleted": false,
   "createdAt": "2026-07-10T13:02:53.676Z",
   "dueDate": "2026-08-15T18:00:00Z",
   "priority": null,
@@ -543,7 +543,7 @@ curl -X DELETE http://localhost:3000/api/tasks/6
     "id": 6,
     "title": "Segunda tarefa",
     "description": "Uma descrição",
-    "completed": false,
+    "isCompleted": false,
     "dueDate": null,
     "priority": null,
     "tags": [],
@@ -641,7 +641,7 @@ curl http://localhost:3000/api/tasks/priority/high
     "id": 1,
     "title": "Aprender Express",
     "description": "",
-    "completed": true,
+    "isCompleted": true,
     "priority": "high",
     "dueDate": null,
     "tags": ["framework"],
@@ -651,7 +651,7 @@ curl http://localhost:3000/api/tasks/priority/high
     "id": 3,
     "title": "Tarefa urgente",
     "description": "Algo importante",
-    "completed": false,
+    "isCompleted": false,
     "priority": "high",
     "dueDate": null,
     "tags": ["urgente", "backend"],
@@ -711,7 +711,7 @@ Cada tarefa possui a seguinte estrutura:
   id: number,                    // Auto-incrementado, único
   title: string,                 // Obrigatório, max 255 caracteres
   description: string,           // Opcional, max 2000 caracteres, padrão: ""
-  completed: boolean,            // Opcional, padrão: false
+  isCompleted: boolean,           // Opcional, padrão: false
   dueDate: string (ISO 8601),   // Opcional, padrão: null (pode ser adicionado via PATCH)
   priority: string,              // Opcional, um de "low" | "medium" | "high", padrão: null
   tags: string[],                // Opcional, array de strings max 10 items cada um max 50 chars, padrão: []

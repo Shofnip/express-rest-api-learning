@@ -12,7 +12,7 @@ applies_to:
 - `title` is required and must be non-empty (trim whitespace)
 - `title` max length: 255 characters
 - `description` max length: 2000 characters
-- `completed` defaults to `false`
+- `isCompleted` defaults to `false`
 - `createdAt` automatically set to current timestamp (ISO 8601)
 - `priority` accepted values: `low`, `medium`, `high`; defaults to `null`
 - `tags` array of strings, max 10 items, each max 50 characters; defaults to `[]`
