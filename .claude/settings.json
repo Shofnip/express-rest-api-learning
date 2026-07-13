@@ -1,4 +1,10 @@
 {
+  "permissions": {
+    "ask": [
+      "Edit(CLAUDE.md)",
+      "Edit(API.md)"
+    ]
+  },
   "hooks": {
     "PreToolUse": [
       {
