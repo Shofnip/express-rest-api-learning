@@ -14,8 +14,14 @@ db.exec(`
     due_date TEXT,
     priority TEXT,
     tags TEXT NOT NULL DEFAULT '[]',
+    estimated_hours REAL,
     created_at TEXT NOT NULL
   )
 `);
+
+const existingColumns = db.prepare('PRAGMA table_info(tasks)').all().map((column) => column.name);
+if (!existingColumns.includes('estimated_hours')) {
+  db.exec('ALTER TABLE tasks ADD COLUMN estimated_hours REAL');
+}
 
 module.exports = db;

@@ -8,6 +8,7 @@ const rowToTask = (row) => ({
   dueDate: row.due_date,
   priority: row.priority,
   tags: JSON.parse(row.tags),
+  estimatedHours: row.estimated_hours,
   createdAt: row.created_at
 });
 
@@ -22,12 +23,13 @@ const save = (taskData) => {
   const isCompleted = taskData.isCompleted || false;
   const priority = taskData.priority || null;
   const tags = taskData.tags || [];
+  const estimatedHours = taskData.estimatedHours !== undefined ? taskData.estimatedHours : null;
   const createdAt = new Date().toISOString();
 
   const result = db.prepare(`
-    INSERT INTO tasks (title, description, is_completed, due_date, priority, tags, created_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-  `).run(title, description, isCompleted ? 1 : 0, null, priority, JSON.stringify(tags), createdAt);
+    INSERT INTO tasks (title, description, is_completed, due_date, priority, tags, estimated_hours, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(title, description, isCompleted ? 1 : 0, null, priority, JSON.stringify(tags), estimatedHours, createdAt);
 
   return findById(result.lastInsertRowid);
 };
@@ -81,6 +83,11 @@ const updateById = (id, updates) => {
   if (updates.tags !== undefined) {
     fields.push('tags = ?');
     values.push(JSON.stringify(updates.tags));
+  }
+
+  if (updates.estimatedHours !== undefined) {
+    fields.push('estimated_hours = ?');
+    values.push(updates.estimatedHours);
   }
 
   if (fields.length === 0) return task;

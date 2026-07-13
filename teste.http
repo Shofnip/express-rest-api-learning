@@ -124,6 +124,51 @@ Content-Type: application/json
   "priority": "urgente"
 }
 
+### ========== ESTIMATED HOURS ==========
+
+### Criar tarefa com estimatedHours
+POST {{baseUrl}}/tasks
+Content-Type: application/json
+
+{
+  "title": "Tarefa com estimativa de horas",
+  "estimatedHours": 4
+}
+
+### Criar tarefa sem estimatedHours (valor padrão: null)
+POST {{baseUrl}}/tasks
+Content-Type: application/json
+
+{
+  "title": "Tarefa sem estimativa de horas"
+}
+
+### Atualizar estimatedHours de uma tarefa
+PUT {{baseUrl}}/tasks/1
+Content-Type: application/json
+
+{
+  "estimatedHours": 8
+}
+
+### Tentar criar tarefa com estimatedHours negativo (erro)
+POST {{baseUrl}}/tasks
+Content-Type: application/json
+
+{
+  "title": "Tarefa com estimativa negativa",
+  "estimatedHours": -2
+}
+
+### Tentar criar tarefa com estimatedHours não sendo número (erro)
+POST {{baseUrl}}/tasks
+Content-Type: application/json
+
+{
+  "title": "Tarefa com estimativa inválida",
+  "estimatedHours": "quatro"
+}
+
 ### ========== LISTAR TAREFAS ==========
 
 ### Listar todas as tarefas

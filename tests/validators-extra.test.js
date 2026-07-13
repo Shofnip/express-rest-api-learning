@@ -6,7 +6,8 @@ const {
   validateCountStatus,
   validatePriority,
   validateTags,
-  validateId
+  validateId,
+  validateEstimatedHours
 } = require('../utils/validators');
 
 describe('validateCreateTask', () => {
@@ -101,6 +102,42 @@ describe('validateCreateTask', () => {
     const result = validateCreateTask({ title: 'Título', tags });
 
     expect(result).toEqual({ isValid: true });
+  });
+
+  test('aceita body com estimatedHours válido', () => {
+    const result = validateCreateTask({ title: 'Título', estimatedHours: 5 });
+
+    expect(result).toEqual({ isValid: true });
+  });
+
+  test('aceita body sem estimatedHours (padrão null)', () => {
+    const result = validateCreateTask({ title: 'Título' });
+
+    expect(result).toEqual({ isValid: true });
+  });
+
+  test('aceita estimatedHours null', () => {
+    const result = validateCreateTask({ title: 'Título', estimatedHours: null });
+
+    expect(result).toEqual({ isValid: true });
+  });
+
+  test('rejeita estimatedHours negativo', () => {
+    const result = validateCreateTask({ title: 'Título', estimatedHours: -3 });
+
+    expect(result).toEqual({
+      isValid: false,
+      error: 'estimatedHours não pode ser negativo.'
+    });
+  });
+
+  test('rejeita estimatedHours que não é um número', () => {
+    const result = validateCreateTask({ title: 'Título', estimatedHours: '5' });
+
+    expect(result).toEqual({
+      isValid: false,
+      error: 'estimatedHours deve ser um número.'
+    });
   });
 
   test('rejeita título numérico sem lançar exceção', () => {
@@ -198,6 +235,42 @@ describe('validateUpdateTask', () => {
     expect(result).toEqual({ isValid: false, error: 'Cada tag deve ser uma string.' });
   });
 
+  test('aceita estimatedHours válido quando fornecido', () => {
+    const result = validateUpdateTask({ estimatedHours: 8 });
+
+    expect(result).toEqual({ isValid: true });
+  });
+
+  test('aceita body sem estimatedHours (mantém valor atual)', () => {
+    const result = validateUpdateTask({ title: 'Título' });
+
+    expect(result).toEqual({ isValid: true });
+  });
+
+  test('aceita estimatedHours null (mantém sem estimativa)', () => {
+    const result = validateUpdateTask({ estimatedHours: null });
+
+    expect(result).toEqual({ isValid: true });
+  });
+
+  test('rejeita estimatedHours negativo quando fornecido', () => {
+    const result = validateUpdateTask({ estimatedHours: -1 });
+
+    expect(result).toEqual({
+      isValid: false,
+      error: 'estimatedHours não pode ser negativo.'
+    });
+  });
+
+  test('rejeita estimatedHours que não é um número quando fornecido', () => {
+    const result = validateUpdateTask({ estimatedHours: 'oito' });
+
+    expect(result).toEqual({
+      isValid: false,
+      error: 'estimatedHours deve ser um número.'
+    });
+  });
+
   test('rejeita título numérico sem lançar exceção', () => {
     const result = validateUpdateTask({ title: 123 });
 
@@ -292,6 +365,52 @@ describe('validateTags', () => {
     const result = validateTags('backend');
 
     expect(result).toEqual({ isValid: false, error: 'As tags devem ser um array de strings.' });
+  });
+});
+
+describe('validateEstimatedHours', () => {
+  test('aceita um número positivo', () => {
+    expect(validateEstimatedHours(5)).toEqual({ isValid: true });
+  });
+
+  test('aceita 0 (limite exato, valor válido apesar de falsy)', () => {
+    expect(validateEstimatedHours(0)).toEqual({ isValid: true });
+  });
+
+  test('rejeita número negativo', () => {
+    const result = validateEstimatedHours(-1);
+
+    expect(result).toEqual({
+      isValid: false,
+      error: 'estimatedHours não pode ser negativo.'
+    });
+  });
+
+  test('rejeita string', () => {
+    const result = validateEstimatedHours('5');
+
+    expect(result).toEqual({
+      isValid: false,
+      error: 'estimatedHours deve ser um número.'
+    });
+  });
+
+  test('rejeita undefined', () => {
+    const result = validateEstimatedHours(undefined);
+
+    expect(result).toEqual({
+      isValid: false,
+      error: 'estimatedHours deve ser um número.'
+    });
+  });
+
+  test('rejeita NaN', () => {
+    const result = validateEstimatedHours(NaN);
+
+    expect(result).toEqual({
+      isValid: false,
+      error: 'estimatedHours deve ser um número.'
+    });
   });
 });
 

@@ -149,7 +149,8 @@ Layered architecture with separation of concerns:
 
 ## Data Model
 
-Tasks stored with auto-incrementing IDs:
+Tasks stored with auto-incrementing IDs. This is an illustrative snapshot, not the exhaustive
+field list — @API.md's own "Data Model" section is the authoritative, always-current source:
 
 ```javascript
 {

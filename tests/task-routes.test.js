@@ -11,6 +11,7 @@ jest.mock('../services/db', () => {
       due_date TEXT,
       priority TEXT,
       tags TEXT NOT NULL DEFAULT '[]',
+      estimated_hours REAL,
       created_at TEXT NOT NULL
     )
   `);
@@ -128,6 +129,40 @@ describe('POST /api/tasks', () => {
 
     expect(response.status).toBe(400);
     expect(response.body).toEqual({ error: 'Cada tag não pode exceder 50 caracteres.' });
+  });
+
+  test('cria uma tarefa com estimatedHours e reflete o valor exato', async () => {
+    const response = await request(app)
+      .post('/api/tasks')
+      .send({ title: 'Título', estimatedHours: 4.5 });
+
+    expect(response.status).toBe(201);
+    expect(response.body.estimatedHours).toBe(4.5);
+  });
+
+  test('cria uma tarefa sem estimatedHours e aplica o padrão null', async () => {
+    const response = await request(app).post('/api/tasks').send({ title: 'Título' });
+
+    expect(response.status).toBe(201);
+    expect(response.body.estimatedHours).toBeNull();
+  });
+
+  test('rejeita estimatedHours negativo', async () => {
+    const response = await request(app)
+      .post('/api/tasks')
+      .send({ title: 'Título', estimatedHours: -2 });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toEqual({ error: 'estimatedHours não pode ser negativo.' });
+  });
+
+  test('rejeita estimatedHours que não é um número', async () => {
+    const response = await request(app)
+      .post('/api/tasks')
+      .send({ title: 'Título', estimatedHours: 'quatro' });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toEqual({ error: 'estimatedHours deve ser um número.' });
   });
 
   test('rejeita título numérico com 400 em vez de 500', async () => {
@@ -286,6 +321,17 @@ describe('GET /api/tasks/:id', () => {
     expect(response.status).toBe(200);
     expect(response.body).toEqual(created.body);
   });
+
+  test('retorna o estimatedHours persistido na criação', async () => {
+    const created = await request(app)
+      .post('/api/tasks')
+      .send({ title: 'Estudar Express', estimatedHours: 3 });
+
+    const response = await request(app).get(`/api/tasks/${created.body.id}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body.estimatedHours).toBe(3);
+  });
 });
 
 describe('PUT /api/tasks/:id', () => {
@@ -369,6 +415,19 @@ describe('PUT /api/tasks/:id', () => {
 
     expect(response.status).toBe(400);
     expect(response.body).toEqual({ error: 'A descrição deve ser um texto' });
+  });
+
+  test('atualiza o estimatedHours de uma tarefa existente', async () => {
+    const created = await request(app)
+      .post('/api/tasks')
+      .send({ title: 'Estudar Express', estimatedHours: 2 });
+
+    const response = await request(app)
+      .put(`/api/tasks/${created.body.id}`)
+      .send({ estimatedHours: 10 });
+
+    expect(response.status).toBe(200);
+    expect(response.body.estimatedHours).toBe(10);
   });
 
   test('atualiza parcialmente os campos fornecidos e preserva os demais', async () => {

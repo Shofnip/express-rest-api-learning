@@ -16,6 +16,7 @@ applies_to:
 - `createdAt` automatically set to current timestamp (ISO 8601)
 - `priority` accepted values: `low`, `medium`, `high`; defaults to `null`
 - `tags` array of strings, max 10 items, each max 50 characters; defaults to `[]`
+- `estimatedHours` number >= 0; defaults to `null`
 
 ### Task Updates (PUT /api/tasks/:id)
 - All fields are optional; omit to leave unchanged
@@ -45,6 +46,12 @@ applies_to:
 - Each tag must be between 1 and 50 characters
 - Defaults to `[]` (empty array) on creation
 - Invalid format (non-array, too many items, oversized strings) rejected with validation error
+
+### Task Estimated Hours (optional)
+- Number, must be >= 0
+- Defaults to `null` on creation (no estimate set)
+- Non-numeric or negative values rejected with validation error
+- Updatable via `PUT /api/tasks/:id`
 
 ## Error Responses
 

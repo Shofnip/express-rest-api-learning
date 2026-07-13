@@ -41,6 +41,7 @@ Você vai criar um novo endpoint REST para a API de tarefas seguindo os padrões
   dueDate: ISO8601 string,       // Opcional, padrão: null
   priority: string,              // Opcional: 'low'|'medium'|'high', padrão: null
   tags: string[],                // Opcional, max 10 tags, cada max 50 chars, padrão: []
+  estimatedHours: number,        // Opcional, >= 0, padrão: null
   createdAt: ISO8601 string      // Auto-setado, não editável
 }
 ```

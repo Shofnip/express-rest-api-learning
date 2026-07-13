@@ -32,6 +32,7 @@ Cria uma nova tarefa com os dados fornecidos.
 - `isCompleted` (boolean, opcional) — Status de conclusão. Padrão: `false`.
 - `priority` (string, opcional) — Prioridade da tarefa. Valores aceitos: `low`, `medium` ou `high`. Padrão: `null`.
 - `tags` (string[], opcional) — Array de tags. Máximo 10 tags, cada uma com máximo 50 caracteres. Padrão: `[]`.
+- `estimatedHours` (number, opcional) — Estimativa de horas para concluir a tarefa. Deve ser um número maior ou igual a 0. Padrão: `null`.
 
 ### Exemplo de Request
 
@@ -42,7 +43,8 @@ curl -X POST http://localhost:3000/api/tasks \
     "title": "Estudar Express",
     "description": "Aprender conceitos de middleware e roteamento",
     "isCompleted": false,
-    "priority": "high"
+    "priority": "high",
+    "estimatedHours": 4
   }'
 ```
 
@@ -57,6 +59,7 @@ curl -X POST http://localhost:3000/api/tasks \
   "dueDate": null,
   "priority": "high",
   "tags": ["framework", "backend"],
+  "estimatedHours": 4,
   "createdAt": "2026-07-10T13:07:32.243Z"
 }
 ```
@@ -140,6 +143,20 @@ curl -X POST http://localhost:3000/api/tasks \
 }
 ```
 
+**400 Bad Request** — estimatedHours não é um número
+```json
+{
+  "error": "estimatedHours deve ser um número."
+}
+```
+
+**400 Bad Request** — estimatedHours negativo
+```json
+{
+  "error": "estimatedHours não pode ser negativo."
+}
+```
+
 **500 Internal Server Error** — Erro do servidor
 ```json
 {
@@ -175,6 +192,7 @@ curl http://localhost:3000/api/tasks
     "dueDate": null,
     "priority": "medium",
     "tags": ["framework"],
+    "estimatedHours": 6,
     "createdAt": "2026-07-10T13:01:19.172Z"
   },
   {
@@ -185,6 +203,7 @@ curl http://localhost:3000/api/tasks
     "dueDate": "2026-08-15T18:00:00Z",
     "priority": null,
     "tags": [],
+    "estimatedHours": null,
     "createdAt": "2026-07-10T13:02:53.676Z"
   }
 ]
@@ -228,6 +247,7 @@ curl http://localhost:3000/api/tasks/status/completed
     "dueDate": null,
     "priority": "medium",
     "tags": ["framework"],
+    "estimatedHours": 6,
     "createdAt": "2026-07-10T13:01:19.172Z"
   }
 ]
@@ -277,6 +297,7 @@ curl http://localhost:3000/api/tasks/7
   "dueDate": null,
   "priority": null,
   "tags": [],
+  "estimatedHours": null,
   "createdAt": "2026-07-10T13:07:32.243Z"
 }
 ```
@@ -321,6 +342,7 @@ Atualiza parcialmente uma tarefa existente. Apenas os campos fornecidos serão a
 - `isCompleted` (boolean, opcional) — Novo status de conclusão.
 - `priority` (string, opcional) — Nova prioridade. Valores aceitos: `low`, `medium` ou `high`.
 - `tags` (string[], opcional) — Novas tags. Máximo 10 tags, cada uma com máximo 50 caracteres.
+- `estimatedHours` (number, opcional) — Nova estimativa de horas. Deve ser um número maior ou igual a 0.
 
 **Nota:** Os campos `id` e `createdAt` não podem ser atualizados.
 
@@ -333,7 +355,8 @@ curl -X PUT http://localhost:3000/api/tasks/7 \
     "title": "Estudar Express - Avançado",
     "isCompleted": true,
     "priority": "low",
-    "tags": ["framework", "node.js"]
+    "tags": ["framework", "node.js"],
+    "estimatedHours": 8
   }'
 ```
 
@@ -348,6 +371,7 @@ curl -X PUT http://localhost:3000/api/tasks/7 \
   "dueDate": null,
   "priority": "low",
   "tags": ["framework", "node.js"],
+  "estimatedHours": 8,
   "createdAt": "2026-07-10T13:07:32.243Z"
 }
 ```
@@ -438,6 +462,20 @@ curl -X PUT http://localhost:3000/api/tasks/7 \
 }
 ```
 
+**400 Bad Request** — estimatedHours não é um número
+```json
+{
+  "error": "estimatedHours deve ser um número."
+}
+```
+
+**400 Bad Request** — estimatedHours negativo
+```json
+{
+  "error": "estimatedHours não pode ser negativo."
+}
+```
+
 **404 Not Found** — Tarefa não encontrada
 ```json
 {
@@ -484,6 +522,7 @@ curl -X PATCH http://localhost:3000/api/tasks/4/complete \
   "dueDate": null,
   "priority": null,
   "tags": [],
+  "estimatedHours": null,
   "createdAt": "2026-07-10T13:01:19.172Z"
 }
 ```
@@ -546,7 +585,8 @@ curl -X PATCH http://localhost:3000/api/tasks/5/due-date \
   "createdAt": "2026-07-10T13:02:53.676Z",
   "dueDate": "2026-08-15T18:00:00Z",
   "priority": null,
-  "tags": []
+  "tags": [],
+  "estimatedHours": null
 }
 ```
 
@@ -617,6 +657,7 @@ curl -X DELETE http://localhost:3000/api/tasks/6
     "dueDate": null,
     "priority": null,
     "tags": [],
+    "estimatedHours": null,
     "createdAt": "2026-07-10T13:02:53.696Z"
   }
 }
@@ -715,6 +756,7 @@ curl http://localhost:3000/api/tasks/priority/high
     "priority": "high",
     "dueDate": null,
     "tags": ["framework"],
+    "estimatedHours": 6,
     "createdAt": "2026-07-10T13:01:19.172Z"
   },
   {
@@ -725,6 +767,7 @@ curl http://localhost:3000/api/tasks/priority/high
     "priority": "high",
     "dueDate": null,
     "tags": ["urgente", "backend"],
+    "estimatedHours": null,
     "createdAt": "2026-07-10T13:05:00.000Z"
   }
 ]
@@ -785,6 +828,7 @@ Cada tarefa possui a seguinte estrutura:
   dueDate: string (ISO 8601),   // Opcional, padrão: null (pode ser adicionado via PATCH)
   priority: string,              // Opcional, um de "low" | "medium" | "high", padrão: null
   tags: string[],                // Opcional, array de strings max 10 items cada um max 50 chars, padrão: []
+  estimatedHours: number,        // Opcional, número >= 0, padrão: null
   createdAt: string (ISO 8601)   // Auto-setado, não editável
 }
 ```

@@ -30,6 +30,7 @@ Você vai adicionar um novo campo ao modelo de dados de tarefa. Este processo é
   dueDate: ISO8601 string,       // Opcional, padrão: null
   priority: string,              // Opcional: 'low'|'medium'|'high', padrão: null
   tags: string[],                // Opcional, max 10 tags, cada max 50 chars, padrão: []
+  estimatedHours: number,        // Opcional, >= 0, padrão: null
   createdAt: ISO8601 string      // Auto-setado, não editável
 }
 ```
@@ -123,6 +124,13 @@ Sugerir exemplos cobrindo:
 - Atualização do campo (se aplicável)
 - Erro de validação (se houver)
 
+### 2.7. Manter documentação auxiliar sincronizada
+
+- **`.claude/rules/api-design.md`** — adicionar/atualizar a subseção de regra de negócio do campo (mesmo padrão de "Task Priority"/"Task Tags"), e incluir o campo na lista de `Task Creation (POST /api/tasks)` se aplicável na criação
+- **`.claude/skills/add-field/SKILL.md`** e **`.claude/skills/add-endpoint/SKILL.md`** — atualizar o bloco `Data Model` embutido em cada uma (usado como referência rápida por essas skills) para incluir o novo campo
+
+Essas cópias não são geradas automaticamente a partir de `API.md` — ficam desatualizadas silenciosamente se esta etapa for pulada.
+
 ## 3. Depois de implementar
 
-Apresente checklist confirmando cada etapa (2.1–2.6), listando **cada endpoint do API.md** revisado/atualizado — essa é a parte mais fácil de deixar incompleta.
+Apresente checklist confirmando cada etapa (2.1–2.7), listando **cada endpoint do API.md** revisado/atualizado — essa é a parte mais fácil de deixar incompleta.

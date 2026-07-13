@@ -79,6 +79,13 @@ const validateCreateTask = (body) => {
     }
   }
 
+  if (body.estimatedHours !== undefined && body.estimatedHours !== null) {
+    const estimatedHoursValidation = validateEstimatedHours(body.estimatedHours);
+    if (!estimatedHoursValidation.isValid) {
+      return estimatedHoursValidation;
+    }
+  }
+
   return { isValid: true };
 };
 
@@ -118,6 +125,13 @@ const validateUpdateTask = (body) => {
     }
   }
 
+  if (body.estimatedHours !== undefined && body.estimatedHours !== null) {
+    const estimatedHoursValidation = validateEstimatedHours(body.estimatedHours);
+    if (!estimatedHoursValidation.isValid) {
+      return estimatedHoursValidation;
+    }
+  }
+
   return { isValid: true };
 };
 
@@ -142,6 +156,18 @@ const VALID_PRIORITIES = ['low', 'medium', 'high'];
 const validatePriority = (priority) => {
   if (!VALID_PRIORITIES.includes(priority)) {
     return { isValid: false, error: 'Prioridade inválida. Use "low", "medium" ou "high".' };
+  }
+
+  return { isValid: true };
+};
+
+const validateEstimatedHours = (estimatedHours) => {
+  if (typeof estimatedHours !== 'number' || Number.isNaN(estimatedHours)) {
+    return { isValid: false, error: 'estimatedHours deve ser um número.' };
+  }
+
+  if (estimatedHours < 0) {
+    return { isValid: false, error: 'estimatedHours não pode ser negativo.' };
   }
 
   return { isValid: true };
@@ -211,5 +237,6 @@ module.exports = {
   validateTags,
   validateTitle,
   validateId,
-  validateIsCompleted
+  validateIsCompleted,
+  validateEstimatedHours
 };
