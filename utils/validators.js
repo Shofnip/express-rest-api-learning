@@ -163,5 +163,6 @@ module.exports = {
   validateStatus,
   validateCountStatus,
   validatePriority,
-  validateTags
+  validateTags,
+  validateTitle
 };
