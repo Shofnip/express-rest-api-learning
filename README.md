@@ -15,7 +15,7 @@ Este projeto é um **objeto de estudo** para aprender, na prática, as funcional
 | 2 | Skills | Criar e instalar Skills (`add-endpoint`, `add-field`) para automatizar workflows repetitivos | ✅ Concluído |
 | 3 | MCP | Conectar serviços externos (SQLite para persistência real, GitHub para issues/PRs) | ✅ Concluído |
 | 4 | Code Intelligence | Navegação por símbolos e refactor guiado (`completed` para `isCompleted`) | ✅ Concluído |
-| 5 | Subagents | Delegar tarefas isoladas — usar a issue "Criar testes automatizados" já reservada | ⏳ Pendente |
+| 5 | Subagents | Delegar tarefas isoladas — usar a issue "Criar testes automatizados" já reservada | ✅ Concluído |
 | 6 | Hooks | Automação determinística (lint, bloqueio de `.env`, garantir documentação/Skills sincronizadas) | ⏳ Pendente |
 | 7 | Agent Teams | Múltiplos agentes coordenados (conecta com Agent View descoberto no Projeto 2) | ⏳ Pendente |
 | 8 | Plugins e Marketplaces | Empacotar Skills/Hooks/Subagents; construir MCP server próprio em cima de API existente | ⏳ Pendente |
@@ -26,7 +26,8 @@ Este projeto é um **objeto de estudo** para aprender, na prática, as funcional
 
 ```
 tarefas-api/
-├── server.js                      # Arquivo principal - inicia o servidor
+├── app.js                         # Inicialização do Express, middlewares, montagem das rotas
+├── server.js                      # Só sobe o servidor (app.listen); importa app.js
 ├── package.json                   # Dependências do projeto
 ├── routes/
 │   └── task-routes.js             # Definição de rotas da API
@@ -37,9 +38,11 @@ tarefas-api/
 │   └── task-service.js            # Lógica de negócio e queries SQL
 ├── utils/
 │   └── validators.js              # Validações de entrada
+├── tests/                         # Suíte de testes automatizados (Jest)
 ├── .claude/
+│   ├── agents/                    # Subagents: test-writer, code-explorer, auditor
 │   ├── rules/api-design.md        # Regras de negócio e convenções de API
-│   └── skills/                    # Skills add-endpoint e add-field
+│   └── skills/                    # Skills add-endpoint, add-field e webapp-testing
 ├── API.md                         # Documentação completa de todos os endpoints
 ├── CLAUDE.md                      # Guia do projeto para o Claude Code
 ├── teste.http                     # Requisições de exemplo (REST Client)
@@ -186,6 +189,14 @@ Resposta (200 OK):
   }
 }
 ```
+
+## Testes Automatizados
+
+```bash
+npm test
+```
+
+Roda a suíte Jest em `tests/` (133 testes) — cobre todos os endpoints via `supertest` contra `app.js` e todas as validações de `utils/validators.js`, com casos de borda. `services/db.js` é mockado com SQLite em memória nos testes de rota, então rodar a suíte não afeta o `tasks.db` real.
 
 ## Testando com cURL
 
