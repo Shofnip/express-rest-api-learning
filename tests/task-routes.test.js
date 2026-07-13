@@ -184,7 +184,7 @@ describe('GET /api/tasks/status/:status', () => {
   });
 });
 
-describe('GET /api/tasks/priority/:level', () => {
+describe('GET /api/tasks/priority/:priority', () => {
   test('rejeita prioridade inválida', async () => {
     const response = await request(app).get('/api/tasks/priority/urgent');
 
