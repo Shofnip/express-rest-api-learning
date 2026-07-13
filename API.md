@@ -27,8 +27,8 @@ Cria uma nova tarefa com os dados fornecidos.
 ### Parâmetros
 
 **Body (JSON)**
-- `title` (string, obrigatório) — Título da tarefa. Máximo 255 caracteres. Será trimado automaticamente.
-- `description` (string, opcional) — Descrição da tarefa. Máximo 2000 caracteres. Padrão: string vazia.
+- `title` (string, obrigatório) — Título da tarefa. Máximo 255 caracteres após trim (espaços em branco no início/fim não contam para o limite). Será trimado automaticamente.
+- `description` (string, opcional) — Descrição da tarefa. Máximo 2000 caracteres após trim. Padrão: string vazia.
 - `isCompleted` (boolean, opcional) — Status de conclusão. Padrão: `false`.
 - `priority` (string, opcional) — Prioridade da tarefa. Valores aceitos: `low`, `medium` ou `high`. Padrão: `null`.
 - `tags` (string[], opcional) — Array de tags. Máximo 10 tags, cada uma com máximo 50 caracteres. Padrão: `[]`.
@@ -84,6 +84,13 @@ curl -X POST http://localhost:3000/api/tasks \
 }
 ```
 
+**400 Bad Request** — Descrição em formato inválido
+```json
+{
+  "error": "A descrição deve ser um texto"
+}
+```
+
 **400 Bad Request** — Prioridade inválida
 ```json
 {
@@ -109,6 +116,27 @@ curl -X POST http://localhost:3000/api/tasks \
 ```json
 {
   "error": "Cada tag não pode exceder 50 caracteres."
+}
+```
+
+**400 Bad Request** — Tag não é uma string
+```json
+{
+  "error": "Cada tag deve ser uma string."
+}
+```
+
+**400 Bad Request** — Tag vazia
+```json
+{
+  "error": "Tags não podem ser vazias."
+}
+```
+
+**400 Bad Request** — isCompleted não é um booleano
+```json
+{
+  "error": "isCompleted deve ser um valor booleano (true ou false)."
 }
 ```
 
@@ -288,8 +316,8 @@ Atualiza parcialmente uma tarefa existente. Apenas os campos fornecidos serão a
 - `id` (number, obrigatório) — ID da tarefa a ser atualizada.
 
 **Body (JSON)** — Todos os campos são opcionais
-- `title` (string, opcional) — Novo título. Máximo 255 caracteres.
-- `description` (string, opcional) — Nova descrição. Máximo 2000 caracteres.
+- `title` (string, opcional) — Novo título. Máximo 255 caracteres após trim.
+- `description` (string, opcional) — Nova descrição. Máximo 2000 caracteres após trim.
 - `isCompleted` (boolean, opcional) — Novo status de conclusão.
 - `priority` (string, opcional) — Nova prioridade. Valores aceitos: `low`, `medium` ou `high`.
 - `tags` (string[], opcional) — Novas tags. Máximo 10 tags, cada uma com máximo 50 caracteres.
@@ -347,6 +375,20 @@ curl -X PUT http://localhost:3000/api/tasks/7 \
 }
 ```
 
+**400 Bad Request** — Descrição muito longa
+```json
+{
+  "error": "A descrição não pode exceder 2000 caracteres"
+}
+```
+
+**400 Bad Request** — Descrição em formato inválido
+```json
+{
+  "error": "A descrição deve ser um texto"
+}
+```
+
 **400 Bad Request** — Prioridade inválida
 ```json
 {
@@ -365,6 +407,34 @@ curl -X PUT http://localhost:3000/api/tasks/7 \
 ```json
 {
   "error": "Máximo 10 tags permitidas."
+}
+```
+
+**400 Bad Request** — Tag muito longa
+```json
+{
+  "error": "Cada tag não pode exceder 50 caracteres."
+}
+```
+
+**400 Bad Request** — Tag não é uma string
+```json
+{
+  "error": "Cada tag deve ser uma string."
+}
+```
+
+**400 Bad Request** — Tag vazia
+```json
+{
+  "error": "Tags não podem ser vazias."
+}
+```
+
+**400 Bad Request** — isCompleted não é um booleano
+```json
+{
+  "error": "isCompleted deve ser um valor booleano (true ou false)."
 }
 ```
 
@@ -726,5 +796,5 @@ Cada tarefa possui a seguinte estrutura:
 1. **Trimagem automática**: Os campos `title` e `description` são automaticamente trimados (whitespace removido).
 2. **Idempotência**: Os endpoints GET são idempotentes. POST, PUT, PATCH, DELETE podem não ser idempotentes em múltiplas chamadas.
 3. **Timestamps**: Todas as datas (`createdAt`, `dueDate`) estão em formato ISO 8601 UTC.
-4. **Armazenamento**: Os dados são armazenados em memória e perdidos ao reiniciar o servidor.
+4. **Armazenamento**: Os dados são persistidos em um banco SQLite local (`tasks.db`) via `better-sqlite3` — não são perdidos ao reiniciar o servidor.
 5. **IDs**: São auto-incrementados e nunca reutilizados dentro de uma sessão.

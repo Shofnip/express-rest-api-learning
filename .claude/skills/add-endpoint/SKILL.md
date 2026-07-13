@@ -63,7 +63,7 @@ Se algo estiver faltando, pergunte antes de prosseguir.
 
 2. **Controller** (`controllers/task-controller.js`)
    - Função `async` com `try/catch`
-   - Validar `id` de path params: `parseInt(id); if (isNaN(id)) return res.status(400).json({ error: 'ID inválido. Use um número inteiro.' })`
+   - Validar `id` de path params com `validateId(req.params.id)` (`utils/validators.js`) — usa regex `^\d+$` sobre a string bruta, não `parseInt`/`isNaN` (que aceitam sufixos não-numéricos como `"7abc"`)
    - Chamar service para lógica de negócio
    - Responder com HTTP correto (200/201/400/404/500)
    - Erro inesperado: 500 `{ error: 'Erro ao <ação> tarefa' }` (em português)

@@ -1,14 +1,16 @@
+const ISO_8601_REGEX = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}(:\d{2})?(\.\d{1,3})?(Z|[+-]\d{2}:\d{2})?)?$/;
+
 const MAX_TITLE_LENGTH = 255;
 const MAX_DESCRIPTION_LENGTH = 2000;
 const MAX_TAGS = 10;
 const MAX_TAG_LENGTH = 50;
 
 const validateTitle = (title) => {
-  if (!title || title.trim().length === 0) {
+  if (typeof title !== 'string' || title.trim().length === 0) {
     return { isValid: false, error: 'O título é obrigatório' };
   }
 
-  if (title.length > MAX_TITLE_LENGTH) {
+  if (title.trim().length > MAX_TITLE_LENGTH) {
     return { isValid: false, error: `O título não pode exceder ${MAX_TITLE_LENGTH} caracteres` };
   }
 
@@ -16,12 +18,28 @@ const validateTitle = (title) => {
 };
 
 const validateDescription = (description) => {
-  if (!description || description.trim().length === 0) {
+  if (description === undefined || description === null || description === '') {
     return { isValid: true };
   }
 
-  if (description.length > MAX_DESCRIPTION_LENGTH) {
+  if (typeof description !== 'string') {
+    return { isValid: false, error: 'A descrição deve ser um texto' };
+  }
+
+  if (description.trim().length === 0) {
+    return { isValid: true };
+  }
+
+  if (description.trim().length > MAX_DESCRIPTION_LENGTH) {
     return { isValid: false, error: `A descrição não pode exceder ${MAX_DESCRIPTION_LENGTH} caracteres` };
+  }
+
+  return { isValid: true };
+};
+
+const validateIsCompleted = (isCompleted) => {
+  if (typeof isCompleted !== 'boolean') {
+    return { isValid: false, error: 'isCompleted deve ser um valor booleano (true ou false).' };
   }
 
   return { isValid: true };
@@ -33,10 +51,17 @@ const validateCreateTask = (body) => {
     return titleValidation;
   }
 
-  if (body.description) {
+  if (body.description !== undefined && body.description !== null) {
     const descriptionValidation = validateDescription(body.description);
     if (!descriptionValidation.isValid) {
       return descriptionValidation;
+    }
+  }
+
+  if (body.isCompleted !== undefined && body.isCompleted !== null) {
+    const isCompletedValidation = validateIsCompleted(body.isCompleted);
+    if (!isCompletedValidation.isValid) {
+      return isCompletedValidation;
     }
   }
 
@@ -72,6 +97,13 @@ const validateUpdateTask = (body) => {
     }
   }
 
+  if (body.isCompleted !== undefined && body.isCompleted !== null) {
+    const isCompletedValidation = validateIsCompleted(body.isCompleted);
+    if (!isCompletedValidation.isValid) {
+      return isCompletedValidation;
+    }
+  }
+
   if (body.priority !== undefined && body.priority !== null) {
     const priorityValidation = validatePriority(body.priority);
     if (!priorityValidation.isValid) {
@@ -90,12 +122,15 @@ const validateUpdateTask = (body) => {
 };
 
 const validateDueDate = (dueDate) => {
-  if (!dueDate || dueDate.trim().length === 0) {
+  const isEmpty = dueDate === undefined || dueDate === null
+    || (typeof dueDate === 'string' && dueDate.trim().length === 0);
+
+  if (isEmpty) {
     return { isValid: false, error: 'A data de vencimento é obrigatória' };
   }
 
-  const date = new Date(dueDate);
-  if (isNaN(date.getTime())) {
+  const hasValidFormat = typeof dueDate === 'string' && ISO_8601_REGEX.test(dueDate.trim());
+  if (!hasValidFormat || isNaN(new Date(dueDate).getTime())) {
     return { isValid: false, error: 'Data de vencimento inválida. Use formato ISO 8601 (ex: 2026-07-15T10:00:00Z)' };
   }
 
@@ -138,6 +173,16 @@ const validateTags = (tags) => {
   return { isValid: true };
 };
 
+const ID_REGEX = /^\d+$/;
+
+const validateId = (id) => {
+  if (typeof id !== 'string' || !ID_REGEX.test(id)) {
+    return { isValid: false, error: 'ID inválido. Use um número inteiro.' };
+  }
+
+  return { isValid: true };
+};
+
 const VALID_STATUSES = ['completed', 'pending'];
 
 const validateStatus = (status) => {
@@ -163,5 +208,8 @@ module.exports = {
   validateStatus,
   validateCountStatus,
   validatePriority,
-  validateTags
+  validateTags,
+  validateTitle,
+  validateId,
+  validateIsCompleted
 };
