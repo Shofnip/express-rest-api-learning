@@ -8,6 +8,55 @@ const TRIGGER_DIR = 'services/';
 const TRIGGER_FILE = 'utils/validators.js';
 const DOC_FILES = ['CLAUDE.md', 'API.md'];
 
+const extractExportedNames = (absPath) => {
+  let content;
+  try {
+    content = fs.readFileSync(absPath, 'utf8');
+  } catch {
+    return [];
+  }
+
+  const match = content.match(/module\.exports\s*=\s*\{([\s\S]*?)\}/);
+  if (!match) {
+    return [];
+  }
+
+  return match[1]
+    .split(',')
+    .map((entry) => entry.split(':')[0].trim())
+    .filter((name) => /^[a-zA-Z_$][\w$]*$/.test(name));
+};
+
+const findSkillsReferencing = (projectDir, names) => {
+  const skillsDir = path.join(projectDir, '.claude', 'skills');
+  let skillDirs;
+  try {
+    skillDirs = fs.readdirSync(skillsDir, { withFileTypes: true })
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => entry.name);
+  } catch {
+    return [];
+  }
+
+  const matches = [];
+  for (const dir of skillDirs) {
+    const skillPath = path.join(skillsDir, dir, 'SKILL.md');
+    let content;
+    try {
+      content = fs.readFileSync(skillPath, 'utf8');
+    } catch {
+      continue;
+    }
+
+    const matchedNames = names.filter((name) => new RegExp(`\\b${name}\\b`).test(content));
+    if (matchedNames.length > 0) {
+      matches.push({ relPath: `.claude/skills/${dir}/SKILL.md`, matchedNames });
+    }
+  }
+
+  return matches;
+};
+
 let input = '';
 process.stdin.on('data', (chunk) => {
   input += chunk;
@@ -57,26 +106,57 @@ process.stdin.on('end', () => {
     process.exit(0);
   }
 
+  const instructionParts = [];
+  const noticeParts = [];
+
   const docsTouched = DOC_FILES.some((doc) => touchedFiles.includes(doc));
-  if (docsTouched) {
+  if (!docsTouched) {
+    noticeParts.push('CLAUDE.md/API.md ainda não tocados');
+    instructionParts.push(
+      `1. Revise a mudança que você acabou de fazer em "${relPath}" (regras de negócio, ` +
+        'validações, contratos de dados, mensagens de erro, nomes de campos, etc.) e compare ' +
+        'com o que está documentado em CLAUDE.md e API.md. Se encontrar divergência, apresente ' +
+        'ao usuário a sugestão de correção específica (qual arquivo, qual trecho, qual texto ' +
+        'novo) e peça aprovação antes de aplicar. NÃO edite CLAUDE.md ou API.md ' +
+        'automaticamente — só proponha. Se não houver divergência, apenas confirme brevemente ' +
+        'que verificou.'
+    );
+  }
+
+  const exportedNames = extractExportedNames(absPath);
+  const skillMatches = exportedNames.length > 0
+    ? findSkillsReferencing(projectDir, exportedNames).filter(
+      (match) => !touchedFiles.includes(match.relPath)
+    )
+    : [];
+
+  if (skillMatches.length > 0) {
+    const skillList = skillMatches
+      .map((match) => `   - "${match.relPath}" referencia: ${match.matchedNames.join(', ')}`)
+      .join('\n');
+
+    noticeParts.push(`${skillMatches.length} Skill(s) podem referenciar código alterado`);
+    instructionParts.push(
+      `2. As seguintes Skills mencionam nomes exportados por "${relPath}" e podem estar ` +
+        `descrevendo um comportamento que você acabou de mudar:\n${skillList}\n   Releia cada ` +
+        'trecho relevante dessas Skills e confirme se ainda descreve o comportamento real. Se ' +
+        'estiver desatualizado, apresente ao usuário a sugestão de correção específica (qual ' +
+        'Skill, qual trecho, qual texto novo) e peça aprovação antes de aplicar. NÃO edite ' +
+        'nenhuma Skill automaticamente — só proponha. Se a Skill ainda estiver correta, apenas ' +
+        'confirme brevemente que verificou.'
+    );
+  }
+
+  if (instructionParts.length === 0) {
     process.exit(0);
   }
 
   const shortNotice =
-    `"${relPath}" foi editado sem que CLAUDE.md/API.md fossem tocados nesta sessão — ` +
-    'pedindo ao Claude para verificar e propor atualização de docs, se necessário.';
+    `"${relPath}" foi editado (${noticeParts.join('; ')}) — pedindo ao Claude para verificar ` +
+    'e propor atualização, se necessário.';
 
   const instruction =
-    `AÇÃO REQUERIDA: você acabou de editar "${relPath}", e nem CLAUDE.md nem API.md foram ` +
-    'tocados nesta sessão. Antes de considerar essa tarefa concluída:\n' +
-    `1. Revise a mudança que você acabou de fazer em "${relPath}" (regras de negócio, ` +
-    'validações, contratos de dados, mensagens de erro, nomes de campos, etc.).\n' +
-    '2. Compare com o que está documentado em CLAUDE.md e API.md.\n' +
-    '3. Se encontrar divergência, apresente ao usuário a sugestão de correção específica ' +
-    '(qual arquivo, qual trecho, qual texto novo) e peça aprovação antes de aplicar.\n' +
-    '4. NÃO edite CLAUDE.md ou API.md automaticamente — só proponha.\n' +
-    '5. Se não houver divergência, apenas confirme brevemente que verificou e que a ' +
-    'documentação já está consistente.';
+    `AÇÃO REQUERIDA após editar "${relPath}":\n${instructionParts.join('\n')}`;
 
   const output = {
     systemMessage: shortNotice,

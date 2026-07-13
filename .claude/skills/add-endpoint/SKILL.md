@@ -64,7 +64,7 @@ Se algo estiver faltando, pergunte antes de prosseguir.
 
 2. **Controller** (`controllers/task-controller.js`)
    - Função `async` com `try/catch`
-   - Validar `id` de path params com `validateId(req.params.id)` (`utils/validators.js`) — usa regex `^\d+$` sobre a string bruta, não `parseInt`/`isNaN` (que aceitam sufixos não-numéricos como `"7abc"`)
+   - Validar `id` de path params com `validateId(req.params.id)` (`utils/validators.js`) — usa regex `^\d+$` sobre a string bruta (não `parseInt`/`isNaN`, que aceitam sufixos não-numéricos como `"7abc"`) e rejeita strings com mais de 15 dígitos (evita perda de precisão ao converter para `Number`)
    - Chamar service para lógica de negócio
    - Responder com HTTP correto (200/201/400/404/500)
    - Erro inesperado: 500 `{ error: 'Erro ao <ação> tarefa' }` (em português)

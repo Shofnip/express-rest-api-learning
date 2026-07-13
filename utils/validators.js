@@ -200,9 +200,11 @@ const validateTags = (tags) => {
 };
 
 const ID_REGEX = /^\d+$/;
+// 15 dígitos evita perda de precisão ao converter para Number (MAX_SAFE_INTEGER tem 16 dígitos)
+const MAX_ID_LENGTH = 15;
 
 const validateId = (id) => {
-  if (typeof id !== 'string' || !ID_REGEX.test(id)) {
+  if (typeof id !== 'string' || !ID_REGEX.test(id) || id.length > MAX_ID_LENGTH) {
     return { isValid: false, error: 'ID inválido. Use um número inteiro.' };
   }
 
