@@ -129,6 +129,33 @@ describe('POST /api/tasks', () => {
     expect(response.status).toBe(400);
     expect(response.body).toEqual({ error: 'Cada tag não pode exceder 50 caracteres.' });
   });
+
+  test('rejeita título numérico com 400 em vez de 500', async () => {
+    const response = await request(app).post('/api/tasks').send({ title: 123 });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toEqual({ error: 'O título é obrigatório' });
+  });
+
+  test('rejeita descrição numérica com 400 em vez de 500', async () => {
+    const response = await request(app)
+      .post('/api/tasks')
+      .send({ title: 'ok', description: 123 });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toEqual({ error: 'A descrição deve ser um texto' });
+  });
+
+  test('rejeita isCompleted que não é booleano', async () => {
+    const response = await request(app)
+      .post('/api/tasks')
+      .send({ title: 'ok', isCompleted: 'yes' });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toEqual({
+      error: 'isCompleted deve ser um valor booleano (true ou false).'
+    });
+  });
 });
 
 describe('GET /api/tasks', () => {
@@ -237,8 +264,8 @@ describe('GET /api/tasks/count', () => {
 });
 
 describe('GET /api/tasks/:id', () => {
-  test('rejeita id inválido', async () => {
-    const response = await request(app).get('/api/tasks/abc');
+  test.each(['abc', '7abc'])('rejeita id inválido "%s"', async (id) => {
+    const response = await request(app).get(`/api/tasks/${id}`);
 
     expect(response.status).toBe(400);
     expect(response.body).toEqual({ error: 'ID inválido. Use um número inteiro.' });
@@ -262,8 +289,8 @@ describe('GET /api/tasks/:id', () => {
 });
 
 describe('PUT /api/tasks/:id', () => {
-  test('rejeita id inválido', async () => {
-    const response = await request(app).put('/api/tasks/abc').send({ title: 'Novo título' });
+  test.each(['abc', '7abc'])('rejeita id inválido "%s"', async (id) => {
+    const response = await request(app).put(`/api/tasks/${id}`).send({ title: 'Novo título' });
 
     expect(response.status).toBe(400);
     expect(response.body).toEqual({ error: 'ID inválido. Use um número inteiro.' });
@@ -311,6 +338,28 @@ describe('PUT /api/tasks/:id', () => {
     });
   });
 
+  test('rejeita título numérico com 400 em vez de 500', async () => {
+    const created = await request(app).post('/api/tasks').send({ title: 'Estudar Express' });
+
+    const response = await request(app)
+      .put(`/api/tasks/${created.body.id}`)
+      .send({ title: 123 });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toEqual({ error: 'O título é obrigatório' });
+  });
+
+  test('rejeita descrição numérica com 400 em vez de 500', async () => {
+    const created = await request(app).post('/api/tasks').send({ title: 'Estudar Express' });
+
+    const response = await request(app)
+      .put(`/api/tasks/${created.body.id}`)
+      .send({ description: 123 });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toEqual({ error: 'A descrição deve ser um texto' });
+  });
+
   test('atualiza parcialmente os campos fornecidos e preserva os demais', async () => {
     const created = await request(app)
       .post('/api/tasks')
@@ -332,8 +381,8 @@ describe('PUT /api/tasks/:id', () => {
 });
 
 describe('PATCH /api/tasks/:id/complete', () => {
-  test('rejeita id inválido', async () => {
-    const response = await request(app).patch('/api/tasks/abc/complete').send({});
+  test.each(['abc', '7abc'])('rejeita id inválido "%s"', async (id) => {
+    const response = await request(app).patch(`/api/tasks/${id}/complete`).send({});
 
     expect(response.status).toBe(400);
     expect(response.body).toEqual({ error: 'ID inválido. Use um número inteiro.' });
@@ -359,9 +408,9 @@ describe('PATCH /api/tasks/:id/complete', () => {
 });
 
 describe('PATCH /api/tasks/:id/due-date', () => {
-  test('rejeita id inválido', async () => {
+  test.each(['abc', '7abc'])('rejeita id inválido "%s"', async (id) => {
     const response = await request(app)
-      .patch('/api/tasks/abc/due-date')
+      .patch(`/api/tasks/${id}/due-date`)
       .send({ dueDate: '2026-08-15T18:00:00Z' });
 
     expect(response.status).toBe(400);
@@ -425,8 +474,8 @@ describe('PATCH /api/tasks/:id/due-date', () => {
 });
 
 describe('DELETE /api/tasks/:id', () => {
-  test('rejeita id inválido', async () => {
-    const response = await request(app).delete('/api/tasks/abc');
+  test.each(['abc', '7abc'])('rejeita id inválido "%s"', async (id) => {
+    const response = await request(app).delete(`/api/tasks/${id}`);
 
     expect(response.status).toBe(400);
     expect(response.body).toEqual({ error: 'ID inválido. Use um número inteiro.' });

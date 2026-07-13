@@ -6,11 +6,11 @@ const MAX_TAGS = 10;
 const MAX_TAG_LENGTH = 50;
 
 const validateTitle = (title) => {
-  if (!title || title.trim().length === 0) {
+  if (typeof title !== 'string' || title.trim().length === 0) {
     return { isValid: false, error: 'O título é obrigatório' };
   }
 
-  if (title.length > MAX_TITLE_LENGTH) {
+  if (title.trim().length > MAX_TITLE_LENGTH) {
     return { isValid: false, error: `O título não pode exceder ${MAX_TITLE_LENGTH} caracteres` };
   }
 
@@ -18,12 +18,28 @@ const validateTitle = (title) => {
 };
 
 const validateDescription = (description) => {
-  if (!description || description.trim().length === 0) {
+  if (!description) {
+    return { isValid: true };
+  }
+
+  if (typeof description !== 'string') {
+    return { isValid: false, error: 'A descrição deve ser um texto' };
+  }
+
+  if (description.trim().length === 0) {
     return { isValid: true };
   }
 
   if (description.length > MAX_DESCRIPTION_LENGTH) {
     return { isValid: false, error: `A descrição não pode exceder ${MAX_DESCRIPTION_LENGTH} caracteres` };
+  }
+
+  return { isValid: true };
+};
+
+const validateIsCompleted = (isCompleted) => {
+  if (typeof isCompleted !== 'boolean') {
+    return { isValid: false, error: 'isCompleted deve ser um valor booleano (true ou false).' };
   }
 
   return { isValid: true };
@@ -39,6 +55,13 @@ const validateCreateTask = (body) => {
     const descriptionValidation = validateDescription(body.description);
     if (!descriptionValidation.isValid) {
       return descriptionValidation;
+    }
+  }
+
+  if (body.isCompleted !== undefined && body.isCompleted !== null) {
+    const isCompletedValidation = validateIsCompleted(body.isCompleted);
+    if (!isCompletedValidation.isValid) {
+      return isCompletedValidation;
     }
   }
 
@@ -71,6 +94,13 @@ const validateUpdateTask = (body) => {
     const descriptionValidation = validateDescription(body.description);
     if (!descriptionValidation.isValid) {
       return descriptionValidation;
+    }
+  }
+
+  if (body.isCompleted !== undefined && body.isCompleted !== null) {
+    const isCompletedValidation = validateIsCompleted(body.isCompleted);
+    if (!isCompletedValidation.isValid) {
+      return isCompletedValidation;
     }
   }
 
@@ -143,6 +173,16 @@ const validateTags = (tags) => {
   return { isValid: true };
 };
 
+const ID_REGEX = /^\d+$/;
+
+const validateId = (id) => {
+  if (typeof id !== 'string' || !ID_REGEX.test(id)) {
+    return { isValid: false, error: 'ID inválido. Use um número inteiro.' };
+  }
+
+  return { isValid: true };
+};
+
 const VALID_STATUSES = ['completed', 'pending'];
 
 const validateStatus = (status) => {
@@ -169,5 +209,7 @@ module.exports = {
   validateCountStatus,
   validatePriority,
   validateTags,
-  validateTitle
+  validateTitle,
+  validateId,
+  validateIsCompleted
 };

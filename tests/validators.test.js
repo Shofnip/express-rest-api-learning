@@ -37,4 +37,18 @@ describe('validateTitle', () => {
       error: 'O título não pode exceder 255 caracteres'
     });
   });
+
+  test('rejeita título numérico sem lançar exceção', () => {
+    const result = validateTitle(123);
+
+    expect(result).toEqual({ isValid: false, error: 'O título é obrigatório' });
+  });
+
+  test('aceita título que só excede 255 caracteres por espaços à direita (limite aplicado após trim)', () => {
+    const title = 'a'.repeat(250) + '          ';
+
+    const result = validateTitle(title);
+
+    expect(result).toEqual({ isValid: true });
+  });
 });

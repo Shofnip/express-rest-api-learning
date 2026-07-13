@@ -5,7 +5,8 @@ const {
   validateStatus,
   validateCountStatus,
   validatePriority,
-  validateTags
+  validateTags,
+  validateId
 } = require('../utils/validators');
 
 describe('validateCreateTask', () => {
@@ -95,6 +96,45 @@ describe('validateCreateTask', () => {
 
     expect(result).toEqual({ isValid: true });
   });
+
+  test('rejeita título numérico sem lançar exceção', () => {
+    const result = validateCreateTask({ title: 123 });
+
+    expect(result).toEqual({ isValid: false, error: 'O título é obrigatório' });
+  });
+
+  test('rejeita descrição numérica sem lançar exceção', () => {
+    const result = validateCreateTask({ title: 'Título', description: 123 });
+
+    expect(result).toEqual({ isValid: false, error: 'A descrição deve ser um texto' });
+  });
+
+  test.each([undefined, null, ''])('aceita descrição %p (comportamento antigo preservado)', (description) => {
+    const result = validateCreateTask({ title: 'Título', description });
+
+    expect(result).toEqual({ isValid: true });
+  });
+
+  test('rejeita isCompleted que não é booleano', () => {
+    const result = validateCreateTask({ title: 'Título', isCompleted: 'yes' });
+
+    expect(result).toEqual({
+      isValid: false,
+      error: 'isCompleted deve ser um valor booleano (true ou false).'
+    });
+  });
+
+  test.each([true, false])('aceita isCompleted %p', (isCompleted) => {
+    const result = validateCreateTask({ title: 'Título', isCompleted });
+
+    expect(result).toEqual({ isValid: true });
+  });
+
+  test('aceita body sem isCompleted (padrão false)', () => {
+    const result = validateCreateTask({ title: 'Título' });
+
+    expect(result).toEqual({ isValid: true });
+  });
 });
 
 describe('validateUpdateTask', () => {
@@ -144,6 +184,33 @@ describe('validateUpdateTask', () => {
     const result = validateUpdateTask({ tags: ['ok', 123] });
 
     expect(result).toEqual({ isValid: false, error: 'Cada tag deve ser uma string.' });
+  });
+
+  test('rejeita título numérico sem lançar exceção', () => {
+    const result = validateUpdateTask({ title: 123 });
+
+    expect(result).toEqual({ isValid: false, error: 'O título é obrigatório' });
+  });
+
+  test('rejeita descrição numérica sem lançar exceção', () => {
+    const result = validateUpdateTask({ description: 123 });
+
+    expect(result).toEqual({ isValid: false, error: 'A descrição deve ser um texto' });
+  });
+
+  test.each([undefined, null, ''])('aceita descrição %p (comportamento antigo preservado)', (description) => {
+    const result = validateUpdateTask({ description });
+
+    expect(result).toEqual({ isValid: true });
+  });
+
+  test('rejeita isCompleted que não é booleano quando fornecido', () => {
+    const result = validateUpdateTask({ isCompleted: 'yes' });
+
+    expect(result).toEqual({
+      isValid: false,
+      error: 'isCompleted deve ser um valor booleano (true ou false).'
+    });
   });
 });
 
@@ -309,5 +376,47 @@ describe('validateDueDate', () => {
       isValid: false,
       error: 'Data de vencimento inválida. Use formato ISO 8601 (ex: 2026-07-15T10:00:00Z)'
     });
+  });
+});
+
+describe('validateId', () => {
+  test('aceita um id numérico válido', () => {
+    expect(validateId('7')).toEqual({ isValid: true });
+  });
+
+  test('rejeita id com sufixo não-numérico (bug histórico do parseInt)', () => {
+    const result = validateId('7abc');
+
+    expect(result).toEqual({ isValid: false, error: 'ID inválido. Use um número inteiro.' });
+  });
+
+  test('rejeita id decimal', () => {
+    const result = validateId('1.9');
+
+    expect(result).toEqual({ isValid: false, error: 'ID inválido. Use um número inteiro.' });
+  });
+
+  test('rejeita id negativo', () => {
+    const result = validateId('-5');
+
+    expect(result).toEqual({ isValid: false, error: 'ID inválido. Use um número inteiro.' });
+  });
+
+  test('rejeita id totalmente não-numérico', () => {
+    const result = validateId('abc');
+
+    expect(result).toEqual({ isValid: false, error: 'ID inválido. Use um número inteiro.' });
+  });
+
+  test('rejeita string vazia', () => {
+    const result = validateId('');
+
+    expect(result).toEqual({ isValid: false, error: 'ID inválido. Use um número inteiro.' });
+  });
+
+  test('rejeita valor não-string sem lançar exceção', () => {
+    const result = validateId(undefined);
+
+    expect(result).toEqual({ isValid: false, error: 'ID inválido. Use um número inteiro.' });
   });
 });
