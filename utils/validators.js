@@ -18,7 +18,7 @@ const validateTitle = (title) => {
 };
 
 const validateDescription = (description) => {
-  if (!description) {
+  if (description === undefined || description === null || description === '') {
     return { isValid: true };
   }
 
@@ -30,7 +30,7 @@ const validateDescription = (description) => {
     return { isValid: true };
   }
 
-  if (description.length > MAX_DESCRIPTION_LENGTH) {
+  if (description.trim().length > MAX_DESCRIPTION_LENGTH) {
     return { isValid: false, error: `A descrição não pode exceder ${MAX_DESCRIPTION_LENGTH} caracteres` };
   }
 
@@ -51,7 +51,7 @@ const validateCreateTask = (body) => {
     return titleValidation;
   }
 
-  if (body.description) {
+  if (body.description !== undefined && body.description !== null) {
     const descriptionValidation = validateDescription(body.description);
     if (!descriptionValidation.isValid) {
       return descriptionValidation;

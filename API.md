@@ -28,7 +28,7 @@ Cria uma nova tarefa com os dados fornecidos.
 
 **Body (JSON)**
 - `title` (string, obrigatório) — Título da tarefa. Máximo 255 caracteres após trim (espaços em branco no início/fim não contam para o limite). Será trimado automaticamente.
-- `description` (string, opcional) — Descrição da tarefa. Máximo 2000 caracteres. Padrão: string vazia.
+- `description` (string, opcional) — Descrição da tarefa. Máximo 2000 caracteres após trim. Padrão: string vazia.
 - `isCompleted` (boolean, opcional) — Status de conclusão. Padrão: `false`.
 - `priority` (string, opcional) — Prioridade da tarefa. Valores aceitos: `low`, `medium` ou `high`. Padrão: `null`.
 - `tags` (string[], opcional) — Array de tags. Máximo 10 tags, cada uma com máximo 50 caracteres. Padrão: `[]`.
@@ -316,8 +316,8 @@ Atualiza parcialmente uma tarefa existente. Apenas os campos fornecidos serão a
 - `id` (number, obrigatório) — ID da tarefa a ser atualizada.
 
 **Body (JSON)** — Todos os campos são opcionais
-- `title` (string, opcional) — Novo título. Máximo 255 caracteres.
-- `description` (string, opcional) — Nova descrição. Máximo 2000 caracteres.
+- `title` (string, opcional) — Novo título. Máximo 255 caracteres após trim.
+- `description` (string, opcional) — Nova descrição. Máximo 2000 caracteres após trim.
 - `isCompleted` (boolean, opcional) — Novo status de conclusão.
 - `priority` (string, opcional) — Nova prioridade. Valores aceitos: `low`, `medium` ou `high`.
 - `tags` (string[], opcional) — Novas tags. Máximo 10 tags, cada uma com máximo 50 caracteres.

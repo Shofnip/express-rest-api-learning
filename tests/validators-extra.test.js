@@ -54,6 +54,12 @@ describe('validateCreateTask', () => {
     });
   });
 
+  test('aceita descrição que só excede 2000 caracteres por espaços à direita (limite aplicado após trim)', () => {
+    const result = validateCreateTask({ title: 'Título', description: 'a'.repeat(1995) + '          ' });
+
+    expect(result).toEqual({ isValid: true });
+  });
+
   test('aceita descrição vazia', () => {
     const result = validateCreateTask({ title: 'Título', description: '' });
 
@@ -113,6 +119,12 @@ describe('validateCreateTask', () => {
     const result = validateCreateTask({ title: 'Título', description });
 
     expect(result).toEqual({ isValid: true });
+  });
+
+  test.each([0, false])('rejeita descrição %p (falsy mas não vazio/nulo)', (description) => {
+    const result = validateCreateTask({ title: 'Título', description });
+
+    expect(result).toEqual({ isValid: false, error: 'A descrição deve ser um texto' });
   });
 
   test('rejeita isCompleted que não é booleano', () => {
@@ -202,6 +214,12 @@ describe('validateUpdateTask', () => {
     const result = validateUpdateTask({ description });
 
     expect(result).toEqual({ isValid: true });
+  });
+
+  test.each([0, false])('rejeita descrição %p quando fornecida (evita crash em taskService.updateById)', (description) => {
+    const result = validateUpdateTask({ description });
+
+    expect(result).toEqual({ isValid: false, error: 'A descrição deve ser um texto' });
   });
 
   test('rejeita isCompleted que não é booleano quando fornecido', () => {

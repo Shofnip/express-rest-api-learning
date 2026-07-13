@@ -360,6 +360,17 @@ describe('PUT /api/tasks/:id', () => {
     expect(response.body).toEqual({ error: 'A descrição deve ser um texto' });
   });
 
+  test.each([0, false])('rejeita descrição %p com 400 em vez de 500 (falsy mas não vazio/nulo)', async (description) => {
+    const created = await request(app).post('/api/tasks').send({ title: 'Estudar Express' });
+
+    const response = await request(app)
+      .put(`/api/tasks/${created.body.id}`)
+      .send({ description });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toEqual({ error: 'A descrição deve ser um texto' });
+  });
+
   test('atualiza parcialmente os campos fornecidos e preserva os demais', async () => {
     const created = await request(app)
       .post('/api/tasks')
