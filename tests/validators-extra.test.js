@@ -286,4 +286,28 @@ describe('validateDueDate', () => {
       error: 'Data de vencimento inválida. Use formato ISO 8601 (ex: 2026-07-15T10:00:00Z)'
     });
   });
+
+  test('aceita data ISO 8601 apenas com a parte da data (sem horário)', () => {
+    const result = validateDueDate('2026-08-15');
+
+    expect(result).toEqual({ isValid: true });
+  });
+
+  test('rejeita formato não-ISO mesmo que o construtor Date consiga interpretá-lo', () => {
+    const result = validateDueDate('07/15/2026');
+
+    expect(result).toEqual({
+      isValid: false,
+      error: 'Data de vencimento inválida. Use formato ISO 8601 (ex: 2026-07-15T10:00:00Z)'
+    });
+  });
+
+  test('rejeita dueDate que não é uma string, sem lançar exceção', () => {
+    const result = validateDueDate(20260815);
+
+    expect(result).toEqual({
+      isValid: false,
+      error: 'Data de vencimento inválida. Use formato ISO 8601 (ex: 2026-07-15T10:00:00Z)'
+    });
+  });
 });

@@ -390,6 +390,19 @@ describe('PATCH /api/tasks/:id/due-date', () => {
     });
   });
 
+  test('rejeita dueDate que não é uma string com 400, sem quebrar em 500', async () => {
+    const created = await request(app).post('/api/tasks').send({ title: 'Estudar Express' });
+
+    const response = await request(app)
+      .patch(`/api/tasks/${created.body.id}/due-date`)
+      .send({ dueDate: 20260815 });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toEqual({
+      error: 'Data de vencimento inválida. Use formato ISO 8601 (ex: 2026-07-15T10:00:00Z)'
+    });
+  });
+
   test('retorna 404 quando a tarefa não existe', async () => {
     const response = await request(app)
       .patch('/api/tasks/999999/due-date')

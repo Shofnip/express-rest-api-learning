@@ -1,3 +1,5 @@
+const ISO_8601_REGEX = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}(:\d{2})?(\.\d{1,3})?(Z|[+-]\d{2}:\d{2})?)?$/;
+
 const MAX_TITLE_LENGTH = 255;
 const MAX_DESCRIPTION_LENGTH = 2000;
 const MAX_TAGS = 10;
@@ -90,12 +92,15 @@ const validateUpdateTask = (body) => {
 };
 
 const validateDueDate = (dueDate) => {
-  if (!dueDate || dueDate.trim().length === 0) {
+  const isEmpty = dueDate === undefined || dueDate === null
+    || (typeof dueDate === 'string' && dueDate.trim().length === 0);
+
+  if (isEmpty) {
     return { isValid: false, error: 'A data de vencimento é obrigatória' };
   }
 
-  const date = new Date(dueDate);
-  if (isNaN(date.getTime())) {
+  const hasValidFormat = typeof dueDate === 'string' && ISO_8601_REGEX.test(dueDate.trim());
+  if (!hasValidFormat || isNaN(new Date(dueDate).getTime())) {
     return { isValid: false, error: 'Data de vencimento inválida. Use formato ISO 8601 (ex: 2026-07-15T10:00:00Z)' };
   }
 
