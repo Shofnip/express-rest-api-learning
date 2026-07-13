@@ -16,7 +16,7 @@ Este projeto é um **objeto de estudo** para aprender, na prática, as funcional
 | 3 | MCP | Conectar serviços externos (SQLite para persistência real, GitHub para issues/PRs) | ✅ Concluído |
 | 4 | Code Intelligence | Navegação por símbolos e refactor guiado (`completed` para `isCompleted`) | ✅ Concluído |
 | 5 | Subagents | Delegar tarefas isoladas — usar a issue "Criar testes automatizados" já reservada | ✅ Concluído |
-| 6 | Hooks | Automação determinística (lint, bloqueio de `.env`, garantir documentação/Skills sincronizadas) | ⏳ Pendente |
+| 6 | Hooks | Automação determinística (lint, bloqueio de `.env`, garantir documentação/Skills sincronizadas) | ✅ Concluído |
 | 7 | Agent Teams | Múltiplos agentes coordenados (conecta com Agent View descoberto no Projeto 2) | ⏳ Pendente |
 | 8 | Plugins e Marketplaces | Empacotar Skills/Hooks/Subagents; construir MCP server próprio em cima de API existente | ⏳ Pendente |
 | - | Etapa paralela | Artifacts (protótipo UI) + Conectores (dados externos), fora do Claude Code | ⏳ Pendente |
@@ -29,6 +29,7 @@ tarefas-api/
 ├── app.js                         # Inicialização do Express, middlewares, montagem das rotas
 ├── server.js                      # Só sobe o servidor (app.listen); importa app.js
 ├── package.json                   # Dependências do projeto
+├── eslint.config.js               # Configuração do ESLint (flat config), usada pelo hook de lint
 ├── routes/
 │   └── task-routes.js             # Definição de rotas da API
 ├── controllers/
@@ -41,8 +42,10 @@ tarefas-api/
 ├── tests/                         # Suíte de testes automatizados (Jest)
 ├── .claude/
 │   ├── agents/                    # Subagents: test-writer, code-explorer, auditor
+│   ├── hooks/                     # Hooks: block-env-access, lint-on-edit, warn-docs-sync, block-dangerous-git
 │   ├── rules/api-design.md        # Regras de negócio e convenções de API
-│   └── skills/                    # Skills add-endpoint, add-field e webapp-testing
+│   ├── settings.json              # Liga os hooks + regras "ask" (versionado, compartilhado)
+│   └── skills/                    # Skills add-endpoint, add-field, commit-push e webapp-testing
 ├── API.md                         # Documentação completa de todos os endpoints
 ├── CLAUDE.md                      # Guia do projeto para o Claude Code
 ├── teste.http                     # Requisições de exemplo (REST Client)
@@ -81,7 +84,7 @@ A API estará disponível em `http://localhost:3000`
 
 ## Endpoints
 
-Esta seção cobre o CRUD básico com exemplos rápidos. A API também expõe filtros por status (`GET /status/:status`) e prioridade (`GET /priority/:priority`), contagem (`GET /count`), marcar como concluída (`PATCH /:id/complete`) e definir data de vencimento (`PATCH /:id/due-date`) — **consulte `API.md` para a documentação completa de todos os 10 endpoints**, incluindo parâmetros, respostas de erro e o Data Model completo (`priority`, `tags`, `dueDate`).
+Esta seção cobre o CRUD básico com exemplos rápidos. A API também expõe filtros por status (`GET /status/:status`) e prioridade (`GET /priority/:priority`), contagem (`GET /count`), marcar como concluída (`PATCH /:id/complete`) e definir data de vencimento (`PATCH /:id/due-date`) — **consulte `API.md` para a documentação completa de todos os 10 endpoints**, incluindo parâmetros, respostas de erro e o Data Model completo (`priority`, `tags`, `dueDate`, `estimatedHours`).
 
 ### 1. Criar Tarefa
 **POST** `/api/tasks`
@@ -196,7 +199,24 @@ Resposta (200 OK):
 npm test
 ```
 
-Roda a suíte Jest em `tests/` (133 testes) — cobre todos os endpoints via `supertest` contra `app.js` e todas as validações de `utils/validators.js`, com casos de borda. `services/db.js` é mockado com SQLite em memória nos testes de rota, então rodar a suíte não afeta o `tasks.db` real.
+Roda a suíte Jest em `tests/` (155 testes) — cobre todos os endpoints via `supertest` contra `app.js` e todas as validações de `utils/validators.js`, com casos de borda. `services/db.js` é mockado com SQLite em memória nos testes de rota, então rodar a suíte não afeta o `tasks.db` real.
+
+```bash
+npm run lint
+```
+
+Roda o ESLint (`eslint.config.js`) sobre o projeto inteiro. O mesmo comando é executado automaticamente pelo hook `lint-on-edit` (veja abaixo) toda vez que um arquivo `.js` em `routes/`, `controllers/`, `services/` ou `utils/` é editado via Claude Code.
+
+## Automação via Hooks (Claude Code)
+
+Além das Skills e Subagents, o projeto usa [Hooks](https://docs.claude.com/en/docs/claude-code/hooks) — comandos determinísticos que o Claude Code executa automaticamente em certos eventos, fora do controle do modelo. Configurados em `.claude/settings.json` + scripts em `.claude/hooks/`:
+
+- **`block-env-access`** — bloqueia qualquer leitura/edição de `.env`/`.env.*` (protege segredos mesmo que solicitado explicitamente na conversa)
+- **`lint-on-edit`** — roda ESLint (com fallback para `node --check`) após toda edição em `routes/`, `controllers/`, `services/` ou `utils/`; bloqueia a edição só se houver erro real, não em warnings
+- **`warn-docs-sync`** — ao editar `services/` ou `utils/validators.js`, verifica (por comparação de timestamp do arquivo, não flag de sessão) se `CLAUDE.md`, `API.md` ou alguma Skill que referencia o código alterado ficaram desatualizados, e instrui a propor uma correção específica para aprovação — nunca edita automaticamente
+- **`block-dangerous-git`** — bloqueia `git push --force` e `git reset --hard` (incluindo variantes disfarçadas em comandos encadeados)
+
+Além dos hooks, `.claude/settings.json` também define regras de permissão `ask` para `Edit(CLAUDE.md)`, `Edit(API.md)` e `Edit(.claude/skills/**)`, exigindo confirmação explícita antes de qualquer edição nesses arquivos, independente do modo de permissão ativo na sessão.
 
 ## Testando com cURL
 
@@ -226,5 +246,5 @@ curl -X DELETE http://localhost:3000/api/tasks/1
 - Os dados são armazenados em um banco **SQLite** (`tasks.db`, gitignored) e persistem entre reinícios do servidor
 - Cada tarefa recebe um ID único auto-incrementado pelo próprio SQLite
 - O campo `createdAt` é preenchido automaticamente na criação com timestamp ISO 8601
-- Campos opcionais na criação: `description` (padrão: `''`), `isCompleted` (padrão: `false`), `priority` (padrão: `null`), `tags` (padrão: `[]`)
+- Campos opcionais na criação: `description` (padrão: `''`), `isCompleted` (padrão: `false`), `priority` (padrão: `null`), `tags` (padrão: `[]`), `estimatedHours` (padrão: `null`)
 - Consulte `API.md` para a documentação completa de todos os endpoints e `CLAUDE.md` para regras de negócio e padrões de desenvolvimento
