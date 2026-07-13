@@ -90,6 +90,7 @@ Se algo estiver faltando, pergunte antes de prosseguir.
    - Subseções: Parâmetros, Exemplo de Request (curl), Exemplo de Response, Possíveis Respostas de Erro
    - Erros: 400/404/500 conforme aplicável
    - Atualizar tabela de "Códigos de Status HTTP" se necessário
+   - Revisar se a nova seção mantém o mesmo tom (português, direto) das demais
 
 ## 3. Depois de implementar
 

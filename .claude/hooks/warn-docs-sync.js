@@ -2,11 +2,18 @@
 
 const path = require('path');
 const fs = require('fs');
-const os = require('os');
 
 const TRIGGER_DIR = 'services/';
 const TRIGGER_FILE = 'utils/validators.js';
 const DOC_FILES = ['CLAUDE.md', 'API.md'];
+
+const getMtimeMs = (absPath) => {
+  try {
+    return fs.statSync(absPath).mtimeMs;
+  } catch {
+    return null;
+  }
+};
 
 const extractExportedNames = (absPath) => {
   let content;
@@ -80,38 +87,27 @@ process.stdin.on('end', () => {
   const absPath = path.resolve(filePath);
   const relPath = path.relative(projectDir, absPath).split(path.sep).join('/');
 
-  const sessionId = payload.session_id || 'default-session';
-  const stateKey = sessionId.replace(/[^a-zA-Z0-9_-]/g, '_');
-  const stateFile = path.join(os.tmpdir(), `claude-hook-docs-sync-${stateKey}.json`);
-
-  let touchedFiles = [];
-  try {
-    touchedFiles = JSON.parse(fs.readFileSync(stateFile, 'utf8'));
-  } catch {
-    touchedFiles = [];
-  }
-
-  if (!touchedFiles.includes(relPath)) {
-    touchedFiles.push(relPath);
-  }
-
-  try {
-    fs.writeFileSync(stateFile, JSON.stringify(touchedFiles));
-  } catch {
+  const isTrigger = relPath.startsWith(TRIGGER_DIR) || relPath === TRIGGER_FILE;
+  if (!isTrigger) {
     process.exit(0);
   }
 
-  const isTrigger = relPath.startsWith(TRIGGER_DIR) || relPath === TRIGGER_FILE;
-  if (!isTrigger) {
+  const triggerMtime = getMtimeMs(absPath);
+  if (triggerMtime === null) {
     process.exit(0);
   }
 
   const instructionParts = [];
   const noticeParts = [];
 
-  const docsTouched = DOC_FILES.some((doc) => touchedFiles.includes(doc));
-  if (!docsTouched) {
-    noticeParts.push('CLAUDE.md/API.md ainda não tocados');
+  const isFresh = (targetAbsPath) => {
+    const mtime = getMtimeMs(targetAbsPath);
+    return mtime !== null && mtime >= triggerMtime;
+  };
+
+  const docsFresh = DOC_FILES.some((doc) => isFresh(path.join(projectDir, doc)));
+  if (!docsFresh) {
+    noticeParts.push(`CLAUDE.md/API.md não editados desde "${relPath}"`);
     instructionParts.push(
       `1. Revise a mudança que você acabou de fazer em "${relPath}" (regras de negócio, ` +
         'validações, contratos de dados, mensagens de erro, nomes de campos, etc.) e compare ' +
@@ -124,18 +120,18 @@ process.stdin.on('end', () => {
   }
 
   const exportedNames = extractExportedNames(absPath);
-  const skillMatches = exportedNames.length > 0
+  const staleSkills = exportedNames.length > 0
     ? findSkillsReferencing(projectDir, exportedNames).filter(
-      (match) => !touchedFiles.includes(match.relPath)
+      (match) => !isFresh(path.join(projectDir, match.relPath))
     )
     : [];
 
-  if (skillMatches.length > 0) {
-    const skillList = skillMatches
+  if (staleSkills.length > 0) {
+    const skillList = staleSkills
       .map((match) => `   - "${match.relPath}" referencia: ${match.matchedNames.join(', ')}`)
       .join('\n');
 
-    noticeParts.push(`${skillMatches.length} Skill(s) podem referenciar código alterado`);
+    noticeParts.push(`${staleSkills.length} Skill(s) não editadas desde "${relPath}"`);
     instructionParts.push(
       `2. As seguintes Skills mencionam nomes exportados por "${relPath}" e podem estar ` +
         `descrevendo um comportamento que você acabou de mudar:\n${skillList}\n   Releia cada ` +
