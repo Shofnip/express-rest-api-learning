@@ -102,21 +102,26 @@ i++; // increment i
 
 ```
 express-rest-api-learning/
-├── server.js                  # Express app initialization, middleware setup
-├── package.json               # Dependencies and scripts
+├── app.js                     # Express app initialization, middleware setup, route mounting
+├── server.js                  # Starts the HTTP server (app.listen); imports app.js
+├── package.json                # Dependencies and scripts
 ├── routes/
-│   └── task-routes.js         # HTTP route definitions (GET, POST, PUT, DELETE)
+│   └── task-routes.js         # HTTP route definitions (GET, POST, PUT, PATCH, DELETE)
 ├── controllers/
-│   └── task-controller.js     # Business logic and response formatting
-├── services/                  # Optional: business logic abstraction (use when needed)
-│   └── task-service.js        # Reusable task operations
-├── middleware/                # Optional: custom middleware functions
+│   └── task-controller.js     # Request/response handling, calls services
+├── services/
+│   ├── db.js                  # SQLite connection setup and table creation
+│   └── task-service.js        # SQL queries via better-sqlite3
+├── middleware/                 # Optional: custom middleware functions
 │   └── error-handler.js       # Global error handling
-├── utils/                     # Optional: helper functions
+├── utils/
 │   └── validators.js          # Input validation helpers
+├── tests/                     # Jest test suite (npm test)
+├── audits/                    # Reports produced by the auditor subagent
 ├── .gitignore
 ├── README.md                  # User-facing documentation (Portuguese OK)
 ├── CLAUDE.md                  # This file
+├── API.md                     # Full endpoint documentation
 └── teste.http                 # REST Client test file
 ```
 
@@ -132,10 +137,15 @@ express-rest-api-learning/
 
 Layered architecture with separation of concerns:
 
-1. **server.js** — Express app initialization, middleware setup, route mounting at `/api/tasks`
-2. **routes/task-routes.js** — HTTP route definitions, maps verbs to controller methods
-3. **controllers/task-controller.js** — Request/response handling, calls services
-4. **Data Layer** — In-memory array (replace with database queries when needed)
+1. **app.js** — Express app initialization, middleware setup, route mounting at `/api/tasks`
+2. **server.js** — Starts the HTTP server (`app.listen`); kept separate from `app.js` so the app
+   can be imported directly in tests (see [State & Persistence](#state--persistence) note on
+   `services/db.js` for the equivalent separation on the data side)
+3. **routes/task-routes.js** — HTTP route definitions, maps verbs to controller methods
+4. **controllers/task-controller.js** — Request/response handling, calls services
+5. **Data Layer** — `services/task-service.js` runs SQL queries via `better-sqlite3` against a
+   local `tasks.db` file; `services/db.js` owns the connection and table setup (see
+   [State & Persistence](#state--persistence))
 
 ## Data Model
 
@@ -178,6 +188,12 @@ validação e documentação em API.md.
 3. Mount in `server.js` or specific routes
 
 ## Testing
+
+**Automated tests (Jest)**
+- Run: `npm test`
+- Suite lives in `tests/` (`app.js` exports the Express app without calling `.listen()` so
+  routes can be tested directly via `supertest`; `services/db.js` is mocked with an in-memory
+  SQLite instance in route-level tests, never the real `tasks.db`)
 
 **REST Client (VS Code extension)**
 - File: `teste.http` has snippets for all endpoints
