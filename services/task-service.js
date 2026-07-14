@@ -34,7 +34,13 @@ const save = (taskData) => {
   return findById(result.lastInsertRowid);
 };
 
-const getAll = () => db.prepare('SELECT * FROM tasks').all().map(rowToTask);
+const getAll = (page = 1, limit = 10) => {
+  const offset = (page - 1) * limit;
+  const data = db.prepare('SELECT * FROM tasks ORDER BY id ASC LIMIT ? OFFSET ?').all(limit, offset).map(rowToTask);
+  const total = db.prepare('SELECT COUNT(*) as total FROM tasks').get().total;
+
+  return { data, total };
+};
 
 const getById = (id) => findById(id);
 

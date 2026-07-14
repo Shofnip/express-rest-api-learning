@@ -168,48 +168,77 @@ curl -X POST http://localhost:3000/api/tasks \
 
 ## 2. GET /api/tasks — Listar todas as tarefas
 
-Retorna um array com todas as tarefas armazenadas.
+Retorna as tarefas armazenadas, paginadas.
 
 ### Parâmetros
 
-Nenhum.
+**Query Parameters**
+- `page` (number, opcional) — Número da página. Deve ser um número inteiro maior ou igual a 1. Padrão: `1`.
+- `limit` (number, opcional) — Quantidade de tarefas por página. Deve ser um número inteiro maior ou igual a 1 e não pode exceder 100. Padrão: `10`.
 
 ### Exemplo de Request
 
 ```bash
-curl http://localhost:3000/api/tasks
+curl http://localhost:3000/api/tasks?page=1&limit=10
 ```
 
 ### Exemplo de Response (200 OK)
 
 ```json
-[
-  {
-    "id": 1,
-    "title": "Aprender Express",
-    "description": "",
-    "isCompleted": true,
-    "dueDate": null,
-    "priority": "medium",
-    "tags": ["framework"],
-    "estimatedHours": 6,
-    "createdAt": "2026-07-10T13:01:19.172Z"
-  },
-  {
-    "id": 2,
-    "title": "Testar endpoints",
-    "description": "Verificar funcionamento da API",
-    "isCompleted": false,
-    "dueDate": "2026-08-15T18:00:00Z",
-    "priority": null,
-    "tags": [],
-    "estimatedHours": null,
-    "createdAt": "2026-07-10T13:02:53.676Z"
-  }
-]
+{
+  "data": [
+    {
+      "id": 1,
+      "title": "Aprender Express",
+      "description": "",
+      "isCompleted": true,
+      "dueDate": null,
+      "priority": "medium",
+      "tags": ["framework"],
+      "estimatedHours": 6,
+      "createdAt": "2026-07-10T13:01:19.172Z"
+    },
+    {
+      "id": 2,
+      "title": "Testar endpoints",
+      "description": "Verificar funcionamento da API",
+      "isCompleted": false,
+      "dueDate": "2026-08-15T18:00:00Z",
+      "priority": null,
+      "tags": [],
+      "estimatedHours": null,
+      "createdAt": "2026-07-10T13:02:53.676Z"
+    }
+  ],
+  "page": 1,
+  "limit": 10,
+  "total": 42,
+  "totalPages": 5
+}
 ```
 
 ### Possíveis Respostas de Erro
+
+**400 Bad Request** — Parâmetro page inválido
+```json
+{
+  "error": "O parâmetro page deve ser um número inteiro maior ou igual a 1."
+}
+```
+
+**400 Bad Request** — Parâmetro limit inválido
+```json
+{
+  "error": "O parâmetro limit deve ser um número inteiro maior ou igual a 1."
+}
+```
+
+**400 Bad Request** — Parâmetro limit excede o máximo
+```json
+{
+  "error": "O parâmetro limit não pode exceder 100."
+}
+```
 
 **500 Internal Server Error** — Erro do servidor
 ```json

@@ -53,6 +53,13 @@ applies_to:
 - Non-numeric or negative values rejected with validation error
 - Updatable via `PUT /api/tasks/:id`
 
+### Task List Pagination (GET /api/tasks, optional)
+- `page`: integer >= 1; defaults to `1`
+- `limit`: integer >= 1 and <= 100; defaults to `10`
+- Response body is an object (not a bare array): `{ data, page, limit, total, totalPages }`
+- `totalPages` is `Math.ceil(total / limit)`
+- Invalid `page` or `limit` (non-integer, below minimum, or `limit` above 100) rejected with validation error
+
 ## Error Responses
 
 Use consistent format: `{ "error": "message" }` or `{ errors: [{ field: "error" }] }`

@@ -41,7 +41,7 @@ tarefas-api/
 │   └── validators.js              # Validações de entrada
 ├── tests/                         # Suíte de testes automatizados (Jest)
 ├── .claude/
-│   ├── agents/                    # Subagents: test-writer, code-explorer, auditor
+│   ├── agents/                    # Subagents: test-writer, code-explorer, auditor, backend-dev, docs-updater
 │   ├── hooks/                     # Hooks: block-env-access, lint-on-edit, warn-docs-sync, block-dangerous-git
 │   ├── rules/api-design.md        # Regras de negócio e convenções de API
 │   ├── settings.json              # Liga os hooks + regras "ask" (versionado, compartilhado)
@@ -112,23 +112,31 @@ Resposta (201 Created):
 }
 ```
 
-### 2. Listar Todas as Tarefas
-**GET** `/api/tasks`
+### 2. Listar Todas as Tarefas (paginado)
+**GET** `/api/tasks?page=1&limit=10`
+
+Query params opcionais: `page` (padrão `1`) e `limit` (padrão `10`, máximo `100`).
 
 Resposta (200 OK):
 ```json
-[
-  {
-    "id": 1,
-    "title": "Minha tarefa",
-    "description": "Descrição da tarefa",
-    "isCompleted": false,
-    "dueDate": null,
-    "priority": null,
-    "tags": [],
-    "createdAt": "2026-07-10T10:30:00.000Z"
-  }
-]
+{
+  "data": [
+    {
+      "id": 1,
+      "title": "Minha tarefa",
+      "description": "Descrição da tarefa",
+      "isCompleted": false,
+      "dueDate": null,
+      "priority": null,
+      "tags": [],
+      "createdAt": "2026-07-10T10:30:00.000Z"
+    }
+  ],
+  "page": 1,
+  "limit": 10,
+  "total": 1,
+  "totalPages": 1
+}
 ```
 
 ### 3. Buscar Tarefa por ID
@@ -199,7 +207,7 @@ Resposta (200 OK):
 npm test
 ```
 
-Roda a suíte Jest em `tests/` (155 testes) — cobre todos os endpoints via `supertest` contra `app.js` e todas as validações de `utils/validators.js`, com casos de borda. `services/db.js` é mockado com SQLite em memória nos testes de rota, então rodar a suíte não afeta o `tasks.db` real.
+Roda a suíte Jest em `tests/` (168 testes) — cobre todos os endpoints via `supertest` contra `app.js` e todas as validações de `utils/validators.js`, com casos de borda. `services/db.js` é mockado com SQLite em memória nos testes de rota, então rodar a suíte não afeta o `tasks.db` real.
 
 ```bash
 npm run lint

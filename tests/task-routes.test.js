@@ -198,7 +198,7 @@ describe('GET /api/tasks', () => {
     const response = await request(app).get('/api/tasks');
 
     expect(response.status).toBe(200);
-    expect(response.body).toEqual([]);
+    expect(response.body).toEqual({ data: [], page: 1, limit: 10, total: 0, totalPages: 0 });
   });
 
   test('retorna todas as tarefas criadas', async () => {
@@ -208,8 +208,123 @@ describe('GET /api/tasks', () => {
     const response = await request(app).get('/api/tasks');
 
     expect(response.status).toBe(200);
-    expect(response.body).toHaveLength(2);
-    expect(response.body.map((task) => task.title)).toEqual(['Tarefa 1', 'Tarefa 2']);
+    expect(response.body.data).toHaveLength(2);
+    expect(response.body.data.map((task) => task.title)).toEqual(['Tarefa 1', 'Tarefa 2']);
+    expect(response.body).toMatchObject({ page: 1, limit: 10, total: 2, totalPages: 1 });
+  });
+
+  test('usa os valores padrão de page e limit quando não são informados', async () => {
+    for (let i = 1; i <= 3; i++) {
+      await request(app).post('/api/tasks').send({ title: `Tarefa ${i}` });
+    }
+
+    const response = await request(app).get('/api/tasks');
+
+    expect(response.status).toBe(200);
+    expect(response.body.page).toBe(1);
+    expect(response.body.limit).toBe(10);
+    expect(response.body.data).toHaveLength(3);
+  });
+
+  test('aplica page e limit corretamente, cortando os resultados via LIMIT/OFFSET', async () => {
+    for (let i = 1; i <= 12; i++) {
+      await request(app).post('/api/tasks').send({ title: `Tarefa ${i}` });
+    }
+
+    const firstPage = await request(app).get('/api/tasks?page=1&limit=5');
+    const secondPage = await request(app).get('/api/tasks?page=2&limit=5');
+    const thirdPage = await request(app).get('/api/tasks?page=3&limit=5');
+
+    expect(firstPage.body.data).toHaveLength(5);
+    expect(firstPage.body.data.map((task) => task.title)).toEqual([
+      'Tarefa 1', 'Tarefa 2', 'Tarefa 3', 'Tarefa 4', 'Tarefa 5'
+    ]);
+
+    expect(secondPage.body.data).toHaveLength(5);
+    expect(secondPage.body.data.map((task) => task.title)).toEqual([
+      'Tarefa 6', 'Tarefa 7', 'Tarefa 8', 'Tarefa 9', 'Tarefa 10'
+    ]);
+
+    expect(thirdPage.body.data).toHaveLength(2);
+    expect(thirdPage.body.data.map((task) => task.title)).toEqual(['Tarefa 11', 'Tarefa 12']);
+
+    expect(firstPage.body.total).toBe(12);
+    expect(secondPage.body.total).toBe(12);
+    expect(thirdPage.body.total).toBe(12);
+  });
+
+  test('calcula totalPages corretamente quando a divisão não é exata', async () => {
+    for (let i = 1; i <= 7; i++) {
+      await request(app).post('/api/tasks').send({ title: `Tarefa ${i}` });
+    }
+
+    const response = await request(app).get('/api/tasks?page=1&limit=3');
+
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({ total: 7, limit: 3, totalPages: 3 });
+  });
+
+  test.each(['abc', '0', '1.5'])('rejeita page inválido "%s"', async (page) => {
+    const response = await request(app).get(`/api/tasks?page=${page}`);
+
+    expect(response.status).toBe(400);
+    expect(response.body).toEqual({
+      error: 'O parâmetro page deve ser um número inteiro maior ou igual a 1.'
+    });
+  });
+
+  test.each(['abc', '0'])('rejeita limit inválido "%s"', async (limit) => {
+    const response = await request(app).get(`/api/tasks?limit=${limit}`);
+
+    expect(response.status).toBe(400);
+    expect(response.body).toEqual({
+      error: 'O parâmetro limit deve ser um número inteiro maior ou igual a 1.'
+    });
+  });
+
+  test('rejeita limit acima de 100', async () => {
+    const response = await request(app).get('/api/tasks?limit=101');
+
+    expect(response.status).toBe(400);
+    expect(response.body).toEqual({ error: 'O parâmetro limit não pode exceder 100.' });
+  });
+
+  // Este teste observa apenas o comportamento HTTP: garante que paginação e total
+  // permanecem consistentes após uma deleção no meio da tabela. Ele NÃO prova que a
+  // query usa "ORDER BY id" — em uma tabela INTEGER PRIMARY KEY AUTOINCREMENT o SQLite
+  // já tende a devolver linhas em ordem de rowid mesmo sem ORDER BY, então este teste
+  // passaria mesmo sem a cláusula. A garantia real de que a query ordena
+  // explicitamente por id está em tests/task-service.test.js, que espiona
+  // `db.prepare` e verifica o SQL usado por `getAll`.
+  test('mantém ordem ascendente por id e total correto na paginação após deletar uma tarefa do meio', async () => {
+    const created = [];
+    for (let i = 1; i <= 6; i++) {
+      const response = await request(app).post('/api/tasks').send({ title: `Tarefa ${i}` });
+      created.push(response.body.id);
+    }
+
+    const idToDelete = created[2];
+    await request(app).delete(`/api/tasks/${idToDelete}`);
+
+    const remainingIds = created.filter((id) => id !== idToDelete);
+
+    const firstPage = await request(app).get('/api/tasks?page=1&limit=2');
+    const secondPage = await request(app).get('/api/tasks?page=2&limit=2');
+    const thirdPage = await request(app).get('/api/tasks?page=3&limit=2');
+
+    expect(firstPage.body).toMatchObject({ total: 5, totalPages: 3 });
+    expect(firstPage.body.data.map((task) => task.id)).toEqual(remainingIds.slice(0, 2));
+    expect(secondPage.body.data.map((task) => task.id)).toEqual(remainingIds.slice(2, 4));
+    expect(thirdPage.body.data.map((task) => task.id)).toEqual(remainingIds.slice(4, 5));
+
+    const allPaginatedIds = [
+      ...firstPage.body.data,
+      ...secondPage.body.data,
+      ...thirdPage.body.data
+    ].map((task) => task.id);
+
+    expect(allPaginatedIds).toEqual(remainingIds);
+    expect(new Set(allPaginatedIds).size).toBe(allPaginatedIds.length);
   });
 });
 

@@ -229,6 +229,29 @@ const validateCountStatus = (status) => {
   return validateStatus(status);
 };
 
+const PAGINATION_INT_REGEX = /^\d+$/;
+const MAX_LIMIT = 100;
+
+const validatePagination = (page, limit) => {
+  if (page !== undefined) {
+    if (typeof page !== 'string' || !PAGINATION_INT_REGEX.test(page) || Number(page) < 1) {
+      return { isValid: false, error: 'O parâmetro page deve ser um número inteiro maior ou igual a 1.' };
+    }
+  }
+
+  if (limit !== undefined) {
+    if (typeof limit !== 'string' || !PAGINATION_INT_REGEX.test(limit) || Number(limit) < 1) {
+      return { isValid: false, error: 'O parâmetro limit deve ser um número inteiro maior ou igual a 1.' };
+    }
+
+    if (Number(limit) > MAX_LIMIT) {
+      return { isValid: false, error: 'O parâmetro limit não pode exceder 100.' };
+    }
+  }
+
+  return { isValid: true };
+};
+
 module.exports = {
   validateCreateTask,
   validateUpdateTask,
@@ -240,5 +263,6 @@ module.exports = {
   validateTitle,
   validateId,
   validateIsCompleted,
-  validateEstimatedHours
+  validateEstimatedHours,
+  validatePagination
 };

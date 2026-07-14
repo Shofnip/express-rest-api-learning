@@ -1,5 +1,5 @@
 const taskService = require('../services/task-service');
-const { validateCreateTask, validateUpdateTask, validateDueDate, validateStatus, validateCountStatus, validatePriority, validateId } = require('../utils/validators');
+const { validateCreateTask, validateUpdateTask, validateDueDate, validateStatus, validateCountStatus, validatePriority, validateId, validatePagination } = require('../utils/validators');
 
 const create = async (req, res) => {
   try {
@@ -17,8 +17,24 @@ const create = async (req, res) => {
 
 const list = async (req, res) => {
   try {
-    const tasks = taskService.getAll();
-    res.json(tasks);
+    const { page, limit } = req.query;
+
+    const validation = validatePagination(page, limit);
+    if (!validation.isValid) {
+      return res.status(400).json({ error: validation.error });
+    }
+
+    const pageNumber = page !== undefined ? Number(page) : 1;
+    const limitNumber = limit !== undefined ? Number(limit) : 10;
+
+    const { data, total } = taskService.getAll(pageNumber, limitNumber);
+    res.json({
+      data,
+      page: pageNumber,
+      limit: limitNumber,
+      total,
+      totalPages: Math.ceil(total / limitNumber)
+    });
   } catch (error) {
     res.status(500).json({ error: 'Erro ao listar tarefas' });
   }

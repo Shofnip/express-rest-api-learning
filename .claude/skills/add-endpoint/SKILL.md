@@ -46,6 +46,20 @@ Você vai criar um novo endpoint REST para a API de tarefas seguindo os padrões
 }
 ```
 
+**Padrão de paginação (reaproveitar em qualquer novo endpoint de listagem):**
+`GET /api/tasks` já pagina via query params `page`/`limit` (`utils/validators.js`,
+função `validatePagination`). Um novo endpoint que retorna uma lista deve seguir o mesmo
+formato de resposta, em vez de inventar um novo:
+```javascript
+{
+  data: [...],          // array de tarefas
+  page: number,          // padrão 1
+  limit: number,          // padrão 10, máximo 100
+  total: number,          // contagem real via COUNT(*), nunca data.length
+  totalPages: number      // Math.ceil(total / limit)
+}
+```
+
 ## 1. Reunir as informações necessárias
 
 Antes de gerar código, você precisa saber:

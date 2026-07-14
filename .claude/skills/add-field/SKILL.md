@@ -99,7 +99,8 @@ Revisar **cada seção** explicitamente:
 
 1. **Data Model** (final) — sempre atualizar
 2. **POST /api/tasks** — adicionar em "Parâmetros" se aceito na criação; adicionar no JSON de resposta; adicionar erro 400 se houver validação
-3. **GET /api/tasks** — atualizar JSON de exemplo (lista)
+3. **GET /api/tasks** — atualizar o array `data` dentro da resposta paginada
+   (`{ data, page, limit, total, totalPages }`) — não é mais um array solto
 4. **GET /api/tasks/status/:status** — atualizar JSON de exemplo
 5. **GET /api/tasks/:id** — atualizar JSON de exemplo
 6. **PUT /api/tasks/:id** — se atualizável: adicionar em "Parâmetros", JSON, erro 400; se não: adicionar nota junto aos campos imutáveis
