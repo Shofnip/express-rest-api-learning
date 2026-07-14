@@ -213,7 +213,7 @@ Além das Skills e Subagents, o projeto usa [Hooks](https://docs.claude.com/en/d
 
 - **`block-env-access`** — bloqueia qualquer leitura/edição de `.env`/`.env.*` (protege segredos mesmo que solicitado explicitamente na conversa)
 - **`lint-on-edit`** — roda ESLint (com fallback para `node --check`) após toda edição em `routes/`, `controllers/`, `services/` ou `utils/`; bloqueia a edição só se houver erro real, não em warnings
-- **`warn-docs-sync`** — ao editar `services/` ou `utils/validators.js`, verifica (por comparação de timestamp do arquivo, não flag de sessão) se `CLAUDE.md`, `API.md` ou alguma Skill que referencia o código alterado ficaram desatualizados, e instrui a propor uma correção específica para aprovação — nunca edita automaticamente
+- **`warn-docs-sync`** — ao editar `services/` ou `utils/validators.js`, verifica (por comparação de timestamp do arquivo, não flag de sessão) se `CLAUDE.md`, `API.md` ou alguma Skill que referencia o código alterado podem estar desatualizados, e emite só um aviso — não verifica nem propõe correção automaticamente; a decisão de pedir uma auditoria fica inteiramente com quem está usando o Claude Code
 - **`block-dangerous-git`** — bloqueia `git push --force` e `git reset --hard` (incluindo variantes disfarçadas em comandos encadeados)
 
 Além dos hooks, `.claude/settings.json` também define regras de permissão `ask` para `Edit(CLAUDE.md)`, `Edit(API.md)` e `Edit(.claude/skills/**)`, exigindo confirmação explícita antes de qualquer edição nesses arquivos, independente do modo de permissão ativo na sessão.

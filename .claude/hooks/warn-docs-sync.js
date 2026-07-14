@@ -97,26 +97,16 @@ process.stdin.on('end', () => {
     process.exit(0);
   }
 
-  const instructionParts = [];
-  const noticeParts = [];
-
   const isFresh = (targetAbsPath) => {
     const mtime = getMtimeMs(targetAbsPath);
     return mtime !== null && mtime >= triggerMtime;
   };
 
+  const noticeParts = [];
+
   const docsFresh = DOC_FILES.some((doc) => isFresh(path.join(projectDir, doc)));
   if (!docsFresh) {
-    noticeParts.push(`CLAUDE.md/API.md não editados desde "${relPath}"`);
-    instructionParts.push(
-      `1. Revise a mudança que você acabou de fazer em "${relPath}" (regras de negócio, ` +
-        'validações, contratos de dados, mensagens de erro, nomes de campos, etc.) e compare ' +
-        'com o que está documentado em CLAUDE.md e API.md. Se encontrar divergência, apresente ' +
-        'ao usuário a sugestão de correção específica (qual arquivo, qual trecho, qual texto ' +
-        'novo) e peça aprovação antes de aplicar. NÃO edite CLAUDE.md ou API.md ' +
-        'automaticamente — só proponha. Se não houver divergência, apenas confirme brevemente ' +
-        'que verificou.'
-    );
+    noticeParts.push('CLAUDE.md/API.md podem estar desatualizados');
   }
 
   const exportedNames = extractExportedNames(absPath);
@@ -127,39 +117,17 @@ process.stdin.on('end', () => {
     : [];
 
   if (staleSkills.length > 0) {
-    const skillList = staleSkills
-      .map((match) => `   - "${match.relPath}" referencia: ${match.matchedNames.join(', ')}`)
-      .join('\n');
-
-    noticeParts.push(`${staleSkills.length} Skill(s) não editadas desde "${relPath}"`);
-    instructionParts.push(
-      `2. As seguintes Skills mencionam nomes exportados por "${relPath}" e podem estar ` +
-        `descrevendo um comportamento que você acabou de mudar:\n${skillList}\n   Releia cada ` +
-        'trecho relevante dessas Skills e confirme se ainda descreve o comportamento real. Se ' +
-        'estiver desatualizado, apresente ao usuário a sugestão de correção específica (qual ' +
-        'Skill, qual trecho, qual texto novo) e peça aprovação antes de aplicar. NÃO edite ' +
-        'nenhuma Skill automaticamente — só proponha. Se a Skill ainda estiver correta, apenas ' +
-        'confirme brevemente que verificou.'
-    );
+    noticeParts.push(`${staleSkills.length} Skill(s) podem estar desatualizadas`);
   }
 
-  if (instructionParts.length === 0) {
+  if (noticeParts.length === 0) {
     process.exit(0);
   }
 
-  const shortNotice =
-    `"${relPath}" foi editado (${noticeParts.join('; ')}) — pedindo ao Claude para verificar ` +
-    'e propor atualização, se necessário.';
-
-  const instruction =
-    `AÇÃO REQUERIDA após editar "${relPath}":\n${instructionParts.join('\n')}`;
-
   const output = {
-    systemMessage: shortNotice,
-    hookSpecificOutput: {
-      hookEventName: 'PostToolUse',
-      additionalContext: instruction,
-    },
+    systemMessage:
+      `"${relPath}" foi editado — ${noticeParts.join('; ')}. Peça uma auditoria (ex: subagent ` +
+      'auditor) se quiser confirmar; nada é verificado automaticamente.',
   };
   process.stdout.write(JSON.stringify(output));
   process.exit(0);
