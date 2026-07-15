@@ -104,6 +104,12 @@ describe('validateCreateTask', () => {
     expect(result).toEqual({ isValid: true });
   });
 
+  test('rejeita tags null (mesmo comportamento de validateUpdateTask)', () => {
+    const result = validateCreateTask({ title: 'Título', tags: null });
+
+    expect(result).toEqual({ isValid: false, error: 'As tags devem ser um array de strings.' });
+  });
+
   test('aceita body com estimatedHours válido', () => {
     const result = validateCreateTask({ title: 'Título', estimatedHours: 5 });
 
@@ -152,10 +158,16 @@ describe('validateCreateTask', () => {
     expect(result).toEqual({ isValid: false, error: 'A descrição deve ser um texto' });
   });
 
-  test.each([undefined, null, ''])('aceita descrição %p (comportamento antigo preservado)', (description) => {
+  test.each([undefined, ''])('aceita descrição %p', (description) => {
     const result = validateCreateTask({ title: 'Título', description });
 
     expect(result).toEqual({ isValid: true });
+  });
+
+  test('rejeita descrição null (mesmo comportamento de validateUpdateTask)', () => {
+    const result = validateCreateTask({ title: 'Título', description: null });
+
+    expect(result).toEqual({ isValid: false, error: 'A descrição deve ser um texto' });
   });
 
   test.each([0, false])('rejeita descrição %p (falsy mas não vazio/nulo)', (description) => {
@@ -283,16 +295,28 @@ describe('validateUpdateTask', () => {
     expect(result).toEqual({ isValid: false, error: 'A descrição deve ser um texto' });
   });
 
-  test.each([undefined, null, ''])('aceita descrição %p (comportamento antigo preservado)', (description) => {
+  test.each([undefined, ''])('aceita descrição %p', (description) => {
     const result = validateUpdateTask({ description });
 
     expect(result).toEqual({ isValid: true });
+  });
+
+  test('rejeita descrição null (antes era aceita por engano, causando 500 em taskService.updateById)', () => {
+    const result = validateUpdateTask({ description: null });
+
+    expect(result).toEqual({ isValid: false, error: 'A descrição deve ser um texto' });
   });
 
   test.each([0, false])('rejeita descrição %p quando fornecida (evita crash em taskService.updateById)', (description) => {
     const result = validateUpdateTask({ description });
 
     expect(result).toEqual({ isValid: false, error: 'A descrição deve ser um texto' });
+  });
+
+  test('rejeita tags null (antes pulava a validação e corrompia o campo)', () => {
+    const result = validateUpdateTask({ tags: null });
+
+    expect(result).toEqual({ isValid: false, error: 'As tags devem ser um array de strings.' });
   });
 
   test('rejeita isCompleted que não é booleano quando fornecido', () => {

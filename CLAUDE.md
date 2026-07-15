@@ -217,3 +217,8 @@ them exactly as before.
 The MCP `sqlite` server configured in `.mcp.json` points at the same `tasks.db` file. It
 exists only so Claude Code can inspect/query the database directly during development —
 it is not part of the app's runtime request path.
+
+`.mcp.json` also configures a `github` MCP server, used to read and manage issues/PRs on
+the project's GitHub repository (e.g. the `test-writer` subagent calls
+`mcp__github__get_issue` to pull issue context when writing tests). Like `sqlite`, it is a
+development-time tool only and is not part of the app's runtime request path.

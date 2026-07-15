@@ -18,7 +18,7 @@ Este projeto é um **objeto de estudo** para aprender, na prática, as funcional
 | 5 | Subagents | Delegar tarefas isoladas — usar a issue "Criar testes automatizados" já reservada | ✅ Concluído |
 | 6 | Hooks | Automação determinística (lint, bloqueio de `.env`, garantir documentação/Skills sincronizadas) | ✅ Concluído |
 | 7 | Agent Teams | Delegação coordenada entre subagents (backend-dev → test-writer + docs-updater em paralelo, hub-and-spoke); Agent Teams (mesh) explorado só conceitualmente, não usado; achado real: a restrição de escopo de um subagent (`Edit(tests/**)`) não é aplicada tecnicamente pelo harness, só por instrução — confirmado experimentalmente | ✅ Concluído |
-| 8 | Plugins e Marketplaces | Empacotar Skills/Hooks/Subagents; construir MCP server próprio em cima de API existente | ⏳ Pendente |
+| 8 | Plugins e Marketplaces | Empacotamento completo em plugin (`tarefas-api-toolkit`) distribuído via Marketplace (local e standalone em repositório separado) + servidor MCP próprio (`tasks-api`) sobre a API REST; implementado, testado de ponta a ponta (incluindo teste de portabilidade num projeto novo) e depois **revertido intencionalmente neste projeto** após o aprendizado — não mantido como artefato permanente daqui. Evidência completa em `audits/auditoria-projeto-8.md` (gitignored) | ↩️ Estudado e revertido |
 | - | Etapa paralela | Artifacts (protótipo UI) + Conectores (dados externos), fora do Claude Code | ⏳ Pendente |
 | Final | Projeto Integrado | Web app único usando todos os conceitos aprendidos | ⏳ Pendente |
 
@@ -207,7 +207,7 @@ Resposta (200 OK):
 npm test
 ```
 
-Roda a suíte Jest em `tests/` (168 testes) — cobre todos os endpoints via `supertest` contra `app.js` e todas as validações de `utils/validators.js`, com casos de borda. `services/db.js` é mockado com SQLite em memória nos testes de rota, então rodar a suíte não afeta o `tasks.db` real.
+Roda a suíte Jest em `tests/` (174 testes) — cobre todos os endpoints via `supertest` contra `app.js` e todas as validações de `utils/validators.js`, com casos de borda. `services/db.js` é mockado com SQLite em memória nos testes de rota, então rodar a suíte não afeta o `tasks.db` real.
 
 ```bash
 npm run lint

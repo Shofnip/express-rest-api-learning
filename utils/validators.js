@@ -18,7 +18,7 @@ const validateTitle = (title) => {
 };
 
 const validateDescription = (description) => {
-  if (description === undefined || description === null || description === '') {
+  if (description === undefined || description === '') {
     return { isValid: true };
   }
 
@@ -51,7 +51,7 @@ const validateCreateTask = (body) => {
     return titleValidation;
   }
 
-  if (body.description !== undefined && body.description !== null) {
+  if (body.description !== undefined) {
     const descriptionValidation = validateDescription(body.description);
     if (!descriptionValidation.isValid) {
       return descriptionValidation;
@@ -72,7 +72,7 @@ const validateCreateTask = (body) => {
     }
   }
 
-  if (body.tags !== undefined && body.tags !== null) {
+  if (body.tags !== undefined) {
     const tagsValidation = validateTags(body.tags);
     if (!tagsValidation.isValid) {
       return tagsValidation;
@@ -118,7 +118,7 @@ const validateUpdateTask = (body) => {
     }
   }
 
-  if (body.tags !== undefined && body.tags !== null) {
+  if (body.tags !== undefined) {
     const tagsValidation = validateTags(body.tags);
     if (!tagsValidation.isValid) {
       return tagsValidation;

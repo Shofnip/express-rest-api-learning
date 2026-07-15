@@ -191,6 +191,24 @@ describe('POST /api/tasks', () => {
       error: 'isCompleted deve ser um valor booleano (true ou false).'
     });
   });
+
+  test('rejeita descrição null com 400', async () => {
+    const response = await request(app)
+      .post('/api/tasks')
+      .send({ title: 'x', description: null });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toEqual({ error: 'A descrição deve ser um texto' });
+  });
+
+  test('rejeita tags null com 400 em vez de corromper o campo', async () => {
+    const response = await request(app)
+      .post('/api/tasks')
+      .send({ title: 'x', tags: null });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toEqual({ error: 'As tags devem ser um array de strings.' });
+  });
 });
 
 describe('GET /api/tasks', () => {
@@ -530,6 +548,34 @@ describe('PUT /api/tasks/:id', () => {
 
     expect(response.status).toBe(400);
     expect(response.body).toEqual({ error: 'A descrição deve ser um texto' });
+  });
+
+  test('rejeita description null com 400 em vez de 500', async () => {
+    const created = await request(app).post('/api/tasks').send({ title: 'Estudar Express' });
+
+    const response = await request(app)
+      .put(`/api/tasks/${created.body.id}`)
+      .send({ description: null });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toEqual({ error: 'A descrição deve ser um texto' });
+  });
+
+  test('rejeita tags null em vez de corromper o campo com null', async () => {
+    const created = await request(app)
+      .post('/api/tasks')
+      .send({ title: 'Estudar Express', tags: ['backend', 'node'] });
+
+    const response = await request(app)
+      .put(`/api/tasks/${created.body.id}`)
+      .send({ tags: null });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toEqual({ error: 'As tags devem ser um array de strings.' });
+
+    const getResponse = await request(app).get(`/api/tasks/${created.body.id}`);
+
+    expect(getResponse.body.tags).toEqual(['backend', 'node']);
   });
 
   test('atualiza o estimatedHours de uma tarefa existente', async () => {
