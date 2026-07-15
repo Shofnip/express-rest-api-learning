@@ -17,7 +17,7 @@ Este projeto é um **objeto de estudo** para aprender, na prática, as funcional
 | 4 | Code Intelligence | Navegação por símbolos e refactor guiado (`completed` para `isCompleted`) | ✅ Concluído |
 | 5 | Subagents | Delegar tarefas isoladas — usar a issue "Criar testes automatizados" já reservada | ✅ Concluído |
 | 6 | Hooks | Automação determinística (lint, bloqueio de `.env`, garantir documentação/Skills sincronizadas) | ✅ Concluído |
-| 7 | Agent Teams | Múltiplos agentes coordenados (conecta com Agent View descoberto no Projeto 2) | ⏳ Pendente |
+| 7 | Agent Teams | Delegação coordenada entre subagents (backend-dev → test-writer + docs-updater em paralelo, hub-and-spoke); Agent Teams (mesh) explorado só conceitualmente, não usado; achado real: a restrição de escopo de um subagent (`Edit(tests/**)`) não é aplicada tecnicamente pelo harness, só por instrução — confirmado experimentalmente | ✅ Concluído |
 | 8 | Plugins e Marketplaces | Empacotar Skills/Hooks/Subagents; construir MCP server próprio em cima de API existente | ⏳ Pendente |
 | - | Etapa paralela | Artifacts (protótipo UI) + Conectores (dados externos), fora do Claude Code | ⏳ Pendente |
 | Final | Projeto Integrado | Web app único usando todos os conceitos aprendidos | ⏳ Pendente |
