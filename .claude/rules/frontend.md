@@ -17,10 +17,13 @@ client/
 ├── package.json               # Frontend-only dependencies (react, vite, vitest, ...)
 ├── vite.config.js             # Dev server proxy: /api/* → http://localhost:3000; also holds
 │                               # the Vitest `test` config block (see Testing below)
+├── public/
+│   └── favicon.svg            # Static asset served as-is by Vite/Express, not processed by the build
 └── src/
     ├── main.jsx                # Entry point, mounts <App />
     ├── App.jsx                 # Top-level layout; routing via react-router-dom (BrowserRouter),
     │                            # currently a single route ("/" → TaskListPage)
+    ├── index.css                # Tailwind entrypoint + base body styles, imported by main.jsx
     ├── test-setup.js            # Loads jest-dom matchers for Vitest (see Testing below)
     ├── api/
     │   └── tasks.js             # fetch wrapper for /api/tasks — the only place calling fetch()

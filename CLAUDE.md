@@ -33,6 +33,8 @@ express-rest-api-learning/
 │                               # static frontend serving in production (see Frontend)
 ├── server.js                  # Starts the HTTP server (app.listen); imports app.js
 ├── package.json                # Backend dependencies and scripts
+├── design/                    # Visual spec and mocked prototype (DESIGN.md, painel-tarefas.jsx),
+│                               # starting point for the frontend built in client/
 ├── client/                    # React + Vite frontend source (own package.json, own node_modules)
 │   └── src/                   # Conventions documented in .claude/rules/frontend.md
 ├── public/                    # Frontend build output (gitignored), served by Express in production
@@ -43,12 +45,17 @@ express-rest-api-learning/
 ├── services/
 │   ├── db.js                  # SQLite connection setup and table creation
 │   └── task-service.js        # SQL queries via better-sqlite3
-├── middleware/                 # Optional: custom middleware functions
-│   └── error-handler.js       # Global error handling
 ├── utils/
 │   └── validators.js          # Input validation helpers
 ├── tests/                     # Jest test suite (npm test)
 ├── audits/                    # Reports produced by the auditor subagent
+├── .claude/
+│   ├── agents/                # Subagents: test-writer, code-explorer, auditor, backend-dev,
+│   │                           # docs-updater, frontend-dev, frontend-test-writer
+│   ├── hooks/                 # block-env-access, lint-on-edit, warn-docs-sync, block-dangerous-git
+│   ├── rules/                 # api-design.md, frontend.md, coding-standards.md
+│   ├── settings.json          # Wires up hooks + "ask" permission rules (versioned, shared)
+│   └── skills/                # add-endpoint, add-field, commit-push, webapp-testing
 ├── .gitignore
 ├── README.md                  # User-facing documentation (Portuguese OK)
 ├── CLAUDE.md                  # This file
@@ -61,7 +68,6 @@ express-rest-api-learning/
 - **routes/** — Map HTTP methods to controller functions. No business logic. Only request validation, routing, and response sending.
 - **controllers/** — Handle request/response cycle. Call services/models, format responses, set HTTP status codes. Keep logic minimal.
 - **services/** — Reusable business logic (data operations, calculations, validations). Can be used by multiple controllers.
-- **middleware/** — Request processing (auth, logging, error handling). Applied globally or to specific routes.
 - **utils/** — Pure helper functions (validators, formatters, calculations). No side effects.
 - **client/** — React frontend source. Talks to the backend only through the REST API in @API.md, never touches SQLite directly. Own conventions in `.claude/rules/frontend.md`.
 - **public/** — Build output of `client/` (via `npm run build`). Not source — never edit directly; regenerated on every build.
@@ -134,11 +140,6 @@ validação e documentação em API.md seguindo os padrões deste projeto.
 ### New Task Field
 Use a Skill `/add-field`, que automatiza atualização do Data Model, 
 validação e documentação em API.md.
-
-### New Middleware
-1. Create file in `middleware/` with kebab-case name
-2. Export function that takes `(req, res, next)`
-3. Mount in `server.js` or specific routes
 
 ## Testing
 
