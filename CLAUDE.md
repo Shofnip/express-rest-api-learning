@@ -4,107 +4,38 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**express-rest-api-learning** is an educational REST API for managing tasks built with Express.js. Data is persisted to a local SQLite database via `better-sqlite3` (see [State & Persistence](#state--persistence)). The project demonstrates proper structure and Claude Code workflow best practices.
+**express-rest-api-learning** is an educational REST API for managing tasks built with Express.js. Data is persisted to a local SQLite database via `better-sqlite3` (see [State & Persistence](#state--persistence)). A React frontend (in `client/`) consumes this API and is served by Express in production (see [Frontend](#frontend)). The project demonstrates proper structure and Claude Code workflow best practices.
 
 ## Quick Start
 
 ```bash
-npm install       # Install dependencies
-npm start         # Run server (port 3000)
-npm run dev       # Run server with auto-reload on file changes
+npm install       # Install backend dependencies
+npm start         # Run server (port 3000) — serves the API and, in production, the built frontend
+npm run dev       # Run backend with auto-reload on file changes
+
+cd client && npm install   # Install frontend dependencies (separate package.json)
+npm run dev                 # Vite dev server with HMR, proxies /api/* to :3000 (no CORS needed)
+npm run build                # Build frontend into ../public (served by Express — see Frontend)
 ```
 
 ## Coding Standards
 
-### 1. Async/Await Only
-- **Always use `async/await`** for asynchronous operations.
-- **Never use `.then()` chains** — convert all promise chains to async/await.
-- Wrap async functions in try/catch for error handling.
-
-```javascript
-// ✅ Good
-async function createTask(req, res) {
-  try {
-    const task = await taskService.save(req.body);
-    res.status(201).json(task);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-}
-
-// ❌ Bad
-function createTask(req, res) {
-  taskService.save(req.body)
-    .then(task => res.status(201).json(task))
-    .catch(error => res.status(400).json({ error: error.message }));
-}
-```
-
-### 2. Naming Conventions
-- **Files & Folders**: Use `kebab-case` (e.g., `task-controller.js`, `task-routes.js`)
-- **Variables & Functions**: Use `camelCase` in code (e.g., `taskId`, `createTask()`)
-- **Constants**: Use `UPPER_SNAKE_CASE` (e.g., `MAX_TASK_LENGTH`)
-- **All technical names in English** — only comments and user-facing messages in Portuguese
-- This applies to **every file in the project**, not just source code — database files, config files, scripts, and any other artifact created for the project (e.g., `tasks.db`, not `tarefas.db`)
-
-```javascript
-// ✅ Good
-// Valida se o título da tarefa está vazio
-const isTaskTitleEmpty = (title) => !title || title.trim().length === 0;
-
-// ❌ Bad
-const validarTituloTarefa = () => {}; // File/variable name mixing languages
-```
-
-### 3. Comments — Only When Really Necessary
-
-**Avoid polluting code with excessive comments.** Write self-documenting code with clear names and logic. Comment only when:
-- The **WHY** is non-obvious (e.g., workaround for a browser bug, optimization reason)
-- Behavior violates common expectations (e.g., intentional mutation instead of immutability)
-- Complex algorithm logic that's not immediately clear from the code
-
-**DO NOT comment:**
-- What the code does (clear naming already communicates this)
-- How it works (if needed, the code design is unclear — refactor instead)
-- Stating the obvious (e.g., `// increment counter`)
-- Removed code or historical notes (`// this used to be X`)
-
-```javascript
-// ✅ Good: Clear naming, no comment needed
-const isTaskCompleted = (task) => task.isCompleted === true;
-
-const validateTaskTitle = (title) => {
-  if (!title.trim().length) {
-    throw new Error('Title is required');
-  }
-};
-
-// ✅ Good: Comment explains non-obvious WHY
-// Trim whitespace here to prevent edge case where user submits title with only spaces
-const sanitizedTitle = title.trim();
-
-// ❌ Bad: Excessive/obvious comments
-const isTaskCompleted = (task) => {
-  // Check if task is completed
-  // Returns true if task.isCompleted is true
-  // Returns false otherwise
-  return task.isCompleted === true;
-};
-
-// ❌ Bad: Comment restates the code
-let i = 0; // set i to 0
-i++; // increment i
-```
-
-**Portuguese in comments:** Yes, if needed. Use Portuguese only in comments and user-facing messages. Variable names, function names, file names remain in English.
+Async/await only (no `.then()` chains), naming conventions (kebab-case files, camelCase
+vars/functions, `UPPER_SNAKE_CASE` constants, English technical names with Portuguese-only
+comments/messages, and the `PascalCase` exception for React components), and comment
+discipline (WHY not WHAT) are documented in `.claude/rules/coding-standards.md`.
 
 ## Project Structure
 
 ```
 express-rest-api-learning/
-├── app.js                     # Express app initialization, middleware setup, route mounting
+├── app.js                     # Express app initialization, middleware setup, route mounting,
+│                               # static frontend serving in production (see Frontend)
 ├── server.js                  # Starts the HTTP server (app.listen); imports app.js
-├── package.json                # Dependencies and scripts
+├── package.json                # Backend dependencies and scripts
+├── client/                    # React + Vite frontend source (own package.json, own node_modules)
+│   └── src/                   # Conventions documented in .claude/rules/frontend.md
+├── public/                    # Frontend build output (gitignored), served by Express in production
 ├── routes/
 │   └── task-routes.js         # HTTP route definitions (GET, POST, PUT, PATCH, DELETE)
 ├── controllers/
@@ -132,6 +63,8 @@ express-rest-api-learning/
 - **services/** — Reusable business logic (data operations, calculations, validations). Can be used by multiple controllers.
 - **middleware/** — Request processing (auth, logging, error handling). Applied globally or to specific routes.
 - **utils/** — Pure helper functions (validators, formatters, calculations). No side effects.
+- **client/** — React frontend source. Talks to the backend only through the REST API in @API.md, never touches SQLite directly. Own conventions in `.claude/rules/frontend.md`.
+- **public/** — Build output of `client/` (via `npm run build`). Not source — never edit directly; regenerated on every build.
 
 ## Architecture
 
@@ -146,6 +79,25 @@ Layered architecture with separation of concerns:
 5. **Data Layer** — `services/task-service.js` runs SQL queries via `better-sqlite3` against a
    local `tasks.db` file; `services/db.js` owns the connection and table setup (see
    [State & Persistence](#state--persistence))
+6. **Frontend serving** — `app.js` serves the built frontend from `public/` via `express.static`
+   plus a fallback route to `index.html` for client-side routing, replacing the current JSON
+   welcome message at `GET /` (see [Frontend](#frontend))
+
+## Frontend
+
+React + Vite SPA in `client/`. It consumes the REST API documented in @API.md and never
+touches SQLite directly — client-side validation in `client/src` mirrors the backend rules
+in `.claude/rules/api-design.md` but the backend remains the source of truth (the API still
+re-validates and rejects on its own).
+
+In development, Vite's dev server proxies `/api/*` to Express (port 3000) for HMR, so the
+browser only ever talks to one origin — **no CORS is configured or needed**, and none should
+be added without revisiting this decision. In production, `npm run build` (inside `client/`)
+outputs to `public/`, which `app.js` serves as static files (see [Architecture](#architecture)).
+
+Commands: see [Quick Start](#quick-start). Structure, naming, and component conventions:
+see `.claude/rules/frontend.md` (kept out of this file to stay under the project's own
+200-line budget for CLAUDE.md).
 
 ## Data Model
 

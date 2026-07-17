@@ -20,16 +20,22 @@ Este projeto é um **objeto de estudo** para aprender, na prática, as funcional
 | 7 | Agent Teams | Delegação coordenada entre subagents (backend-dev → test-writer + docs-updater em paralelo, hub-and-spoke); Agent Teams (mesh) explorado só conceitualmente, não usado; achado real: a restrição de escopo de um subagent (`Edit(tests/**)`) não é aplicada tecnicamente pelo harness, só por instrução — confirmado experimentalmente | ✅ Concluído |
 | 8 | Plugins e Marketplaces | Empacotamento completo em plugin (`tarefas-api-toolkit`) distribuído via Marketplace (local e standalone em repositório separado) + servidor MCP próprio (`tasks-api`) sobre a API REST; implementado, testado de ponta a ponta (incluindo teste de portabilidade num projeto novo) e depois **revertido intencionalmente neste projeto** após o aprendizado — não mantido como artefato permanente daqui. Evidência completa em `audits/auditoria-projeto-8.md` (gitignored) | ↩️ Estudado e revertido |
 | - | Etapa paralela | Artifacts (protótipo UI) + Conectores (dados externos), fora do Claude Code | ⏳ Pendente |
-| Final | Projeto Integrado | Web app único usando todos os conceitos aprendidos | ⏳ Pendente |
+| Final | Projeto Integrado | Web app único usando todos os conceitos aprendidos — spec visual e protótipo mockado em `design/`, implementação real do frontend em andamento em `client/` (listagem de tarefas + modal de criação/edição) | 🔄 Em andamento |
 
 ## Estrutura do Projeto
 
 ```
 tarefas-api/
-├── app.js                         # Inicialização do Express, middlewares, montagem das rotas
+├── app.js                         # Inicialização do Express, middlewares, montagem das rotas,
+│                                   # e serving do frontend buildado em produção (ver Frontend)
 ├── server.js                      # Só sobe o servidor (app.listen); importa app.js
 ├── package.json                   # Dependências do projeto
 ├── eslint.config.js               # Configuração do ESLint (flat config), usada pelo hook de lint
+├── design/                        # Spec visual e protótipo mockado (DESIGN.md, painel-tarefas.jsx)
+│                                   # — ponto de partida do Projeto Integrado (frontend em client/)
+├── client/                        # Frontend React + Vite (package.json próprio) — em
+│                                   # implementação; convenções em .claude/rules/frontend.md
+├── public/                        # Build do frontend (gitignored), servido pelo Express em produção
 ├── routes/
 │   └── task-routes.js             # Definição de rotas da API
 ├── controllers/
@@ -41,9 +47,10 @@ tarefas-api/
 │   └── validators.js              # Validações de entrada
 ├── tests/                         # Suíte de testes automatizados (Jest)
 ├── .claude/
-│   ├── agents/                    # Subagents: test-writer, code-explorer, auditor, backend-dev, docs-updater
+│   ├── agents/                    # Subagents: test-writer, code-explorer, auditor, backend-dev,
+│   │                               # docs-updater, frontend-dev, frontend-test-writer
 │   ├── hooks/                     # Hooks: block-env-access, lint-on-edit, warn-docs-sync, block-dangerous-git
-│   ├── rules/api-design.md        # Regras de negócio e convenções de API
+│   ├── rules/                     # api-design.md, frontend.md (convenções de client/), coding-standards.md
 │   ├── settings.json              # Liga os hooks + regras "ask" (versionado, compartilhado)
 │   └── skills/                    # Skills add-endpoint, add-field, commit-push e webapp-testing
 ├── API.md                         # Documentação completa de todos os endpoints
