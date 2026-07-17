@@ -109,3 +109,10 @@ Se algo estiver faltando, pergunte antes de prosseguir.
 ## 3. Depois de implementar
 
 Apresente um resumo: rota, controller, service (se criado), validador (se criado), atualização em API.md, e snippet para `teste.http` (recomendado).
+
+## Nota — frontend (client/)
+
+Esta Skill **não sincroniza o frontend automaticamente** — isso não é responsabilidade dela.
+Se o endpoint novo (ou alterado) for algo que a tela em `client/` deveria consumir, é um
+lembrete para quem está desenvolvendo avaliar se `client/src/api/tasks.js` (o wrapper de
+`fetch()`) precisa de uma função nova/atualizada correspondente.

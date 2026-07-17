@@ -35,6 +35,12 @@ applies_to:
 - Format: ISO 8601 string (ex: `2026-08-15T18:00:00Z`)
 - Defaults to `null` on creation
 - Any valid date is accepted (past or future)
+- **Known limitation: clearing an already-set `dueDate` is not supported.** `dueDate` is
+  required in the request body (`validateDueDate` rejects empty/`null` with a 400) and no
+  other endpoint touches this column (`PUT /api/tasks/:id` never updates `dueDate`). Frontend
+  behavior (`client/`): clearing the due-date field in the edit form simply sends nothing to
+  this route — the previously saved value stays in the database silently, with no warning
+  shown to the user.
 
 ### Task Priority (optional)
 - Accepted values: `low`, `medium`, `high`

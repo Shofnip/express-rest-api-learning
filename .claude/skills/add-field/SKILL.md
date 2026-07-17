@@ -135,3 +135,11 @@ Essas cópias não são geradas automaticamente a partir de `API.md` — ficam d
 ## 3. Depois de implementar
 
 Apresente checklist confirmando cada etapa (2.1–2.7), listando **cada endpoint do API.md** revisado/atualizado — essa é a parte mais fácil de deixar incompleta.
+
+## Nota — frontend (client/)
+
+Esta Skill **não sincroniza o frontend automaticamente** — isso não é responsabilidade dela.
+Se o campo novo (ou sua regra de validação) for algo relevante para a tela em `client/`, é um
+lembrete para quem está desenvolvendo avaliar se `client/src/utils/validation.js`
+(`validateTask`) e os limites em `client/src/theme.js` (`LIMITS`) também precisam de
+atualização, para não deixar a validação do frontend divergindo silenciosamente da API.

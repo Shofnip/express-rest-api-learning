@@ -585,6 +585,14 @@ curl -X PATCH http://localhost:3000/api/tasks/4/complete \
 
 Define a data de vencimento de uma tarefa. O campo `dueDate` é opcional e aceita qualquer data válida em formato ISO 8601.
 
+**Limitação conhecida — não existe operação para "limpar" um `dueDate` já definido.**
+`dueDate` é obrigatório no body desta rota (`validateDueDate` em `utils/validators.js` rejeita
+valores vazios/`null` com o erro 400 "A data de vencimento é obrigatória" — ver abaixo). Não há
+nenhum outro endpoint capaz de remover uma data de vencimento já salva (`PUT /api/tasks/:id`
+não altera `dueDate`). Reflexo no frontend (`client/`): ao editar uma tarefa e apagar o campo
+de vencimento no formulário, a UI simplesmente não envia nada para esta rota — o valor antigo
+permanece salvo no banco silenciosamente, sem aviso ao usuário.
+
 ### Parâmetros
 
 **Path Parameters**
