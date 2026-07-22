@@ -19,7 +19,7 @@ Este projeto é um **objeto de estudo** para aprender, na prática, as funcional
 | 6 | Hooks | Automação determinística (lint, bloqueio de `.env`, garantir documentação/Skills sincronizadas) | ✅ Concluído |
 | 7 | Agent Teams | Delegação coordenada entre subagents (backend-dev → test-writer + docs-updater em paralelo, hub-and-spoke); Agent Teams (mesh) explorado só conceitualmente, não usado; achado real: a restrição de escopo de um subagent (`Edit(tests/**)`) não é aplicada tecnicamente pelo harness, só por instrução — confirmado experimentalmente | ✅ Concluído |
 | 8 | Plugins e Marketplaces | Empacotamento completo em plugin (`tarefas-api-toolkit`) distribuído via Marketplace (local e standalone em repositório separado) + servidor MCP próprio (`tasks-api`) sobre a API REST; implementado, testado de ponta a ponta (incluindo teste de portabilidade num projeto novo) e depois **revertido intencionalmente neste projeto** após o aprendizado — não mantido como artefato permanente daqui. Evidência completa em `audits/auditoria-projeto-8.md` (gitignored) | ↩️ Estudado e revertido |
-| - | Etapa paralela | Artifacts (protótipo UI) + Conectores (dados externos), fora do Claude Code | ⏳ Pendente |
+| - | Etapa paralela | Artifacts (protótipo UI) + Conectores (dados externos), fora do Claude Code | ✅ Concluído |
 | Final | Projeto Integrado | Web app único usando todos os conceitos aprendidos — spec visual e protótipo mockado em `design/`, frontend real implementado em `client/` (listagem paginada com filtros + formulário de criação/edição), integrado de ponta a ponta com a API real (sem mocks) e auditado (`audits/auditoria-projeto-final.md`, gitignored) | ✅ Concluído |
 
 ## Estrutura do Projeto
